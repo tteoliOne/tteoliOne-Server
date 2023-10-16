@@ -71,6 +71,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/users/kakao").permitAll()
+                .antMatchers("/api/items/**").access("hasRole('ROLE_USER')")
 
                 .anyRequest().authenticated()
                 .and()
