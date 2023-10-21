@@ -59,7 +59,7 @@ jobs:
         
     # 4) gradle 빌드
     - name: Build with Gradle
-      run: ./gradlew clean build --exclude-task test
+      run: ./gradlew clean build --exclude-task test # 테스트 제외
       #working-directory: ${{ env.working-directory }}
       
     # AWS 인증
