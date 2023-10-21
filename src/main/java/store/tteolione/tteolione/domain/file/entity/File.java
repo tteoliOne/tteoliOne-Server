@@ -25,10 +25,9 @@ public class File extends BaseTimeEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public static File toEntity(String fileUrl, Product product) {
+    public static File toEntity(String fileUrl) {
         return File.builder()
                 .fileUrl(fileUrl)
-                .product(product)
                 .build();
     }
 

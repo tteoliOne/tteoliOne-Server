@@ -22,16 +22,25 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public List<File> saveImages(Product product, List<MultipartFile> multipartFiles) throws IOException {
+    public List<File> saveImages(List<MultipartFile> multipartFiles) throws IOException {
         List<File> uploadFiles = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
             String uploadUrl = s3Service.uploadFile(multipartFile);
-            File saveImage = fileRepository.save(File.toEntity(uploadUrl, product));
+            File saveImage = fileRepository.save(File.toEntity(uploadUrl));
             uploadFiles.add(saveImage);
         }
 
         return uploadFiles;
+    }
+
+    @Override
+    public File saveImage(MultipartFile multipartFile) throws IOException {
+
+        String uploadUrl = s3Service.uploadFile(multipartFile);
+        File saveImage = fileRepository.save(File.toEntity(uploadUrl));
+
+        return saveImage;
     }
 
 }

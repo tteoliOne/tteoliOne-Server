@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 public class PostProductRequest {
 
     @NotBlank(message = "사용자 Id를 입력해주세요.")
-    private int userId;
+    private Long userId;
 
     @NotBlank(message = "카테고리 Id를 입력해주세요.")
-    private int categoryId;
+    private Long categoryId;
 
     @NotBlank(message = "상품 제목을 입력해주세요.")
     private String title;
@@ -60,7 +60,5 @@ public class PostProductRequest {
                 .longitude(longitude)
                 .latitude(latitude)
                 .build();
-
-
     }
 }

@@ -28,7 +28,6 @@ public class Product extends BaseTimeEntity {
     private Long productId;
 
 
-    private String receipt;
     private String title;
     private String description;
 
@@ -43,7 +42,7 @@ public class Product extends BaseTimeEntity {
     private EProductSoldStatus soldStatus;
 
     @OneToMany(mappedBy = "product")
-    private List<File> images = new ArrayList<>();
+    private List<File> images = new ArrayList<>(); //마지막 인덱스가 영수증사진
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -53,8 +52,7 @@ public class Product extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Product(String receipt, String title, int buyPrice, int buyCount, int sharePrice, int shareCount, LocalDateTime buyDate, String description, double longitude, double latitude, User user, Category category) {
-        this.receipt = receipt;
+    public Product(String title, int buyPrice, int buyCount, int sharePrice, int shareCount, LocalDateTime buyDate, String description, double longitude, double latitude, User user, Category category) {
         this.title = title;
         this.buyPrice = buyPrice;
         this.buyCount = buyCount;
@@ -69,7 +67,7 @@ public class Product extends BaseTimeEntity {
     }
 
     //연관관계 메서드
-    public void addImages(List<File> images) {
+    public void addPhotos(List<File> images) {
         for (File image : images) {
             image.setProduct(this);
             this.getImages().add(image);
