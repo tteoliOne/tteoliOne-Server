@@ -5,7 +5,7 @@ import lombok.Getter;
 public class GlobalConstants {
 
     @Getter
-    public enum ExceptionCode {
+    public enum ExceptionCode { //에러 코드넘버
         UNKNOWN_ERROR("알려지지 않은 에러입니다.", "UNKNOWN_ERROR"),
         WRONG_TYPE_TOKEN("잘못된 JWT 서명입니다.", "WRONG_TYPE_TOKEN"),
         EXPIRED_TOKEN("만료된 토큰입니다.", "EXPIRED_TOKEN"),
