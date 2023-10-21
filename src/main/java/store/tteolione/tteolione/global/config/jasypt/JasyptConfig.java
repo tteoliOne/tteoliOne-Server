@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 public class JasyptConfig {
 
     @Value("${jasypt.encryptor.password}")
-    private String password = "tIa3j9dC63FVTQw0l98WExF6SFHxRr";
+    private String password;
 
     @Value("${jasypt.encryptor.algorithm}")
-    private String algorithm ="PBEWithMD5AndDES";
+    private String algorithm;
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor(){
@@ -30,10 +30,4 @@ public class JasyptConfig {
         return encryptor;
     }
 
-    public static void main(String[] args) {
-        StringEncryptor encryptor = new JasyptConfig().stringEncryptor();
-        System.out.println(encryptor.encrypt("jdbc:mysql://localhost:3306/tteolione"));
-        System.out.println(encryptor.encrypt("root"));
-        System.out.println(encryptor.encrypt("aws56240@"));
-    }
 }
