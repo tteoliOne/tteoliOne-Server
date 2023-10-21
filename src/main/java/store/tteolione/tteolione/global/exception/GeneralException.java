@@ -13,7 +13,7 @@ public class GeneralException extends RuntimeException {
         this.errorCode = Code.INTERNAL_ERROR;
     }
 
-    public GeneralException(String message) {
+    public GeneralException(String message) { //에러메세지만 작성해서 응답
         super(Code.INTERNAL_ERROR.getMessage(message));
         this.errorCode = Code.INTERNAL_ERROR;
     }
