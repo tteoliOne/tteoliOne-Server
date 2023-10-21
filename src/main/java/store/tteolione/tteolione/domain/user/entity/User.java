@@ -24,6 +24,8 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long userId;
 
+    private String loginId;
+
     private String nickname;
     private String intro;
     private String profile;
@@ -46,6 +48,7 @@ public class User extends BaseTimeEntity {
 
     public static User toKakaoUser(HashMap<String, Object> userInfo) {
         return User.builder()
+                .loginId(EKakaoUserInfo.eKakao.getValue()+userInfo.get("email").toString())
                 .nickname(userInfo.get("nickname").toString())
                 .profile(userInfo.get("profile").toString())
                 .email(userInfo.get("email").toString())
