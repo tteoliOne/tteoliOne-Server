@@ -70,6 +70,7 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
+                .antMatchers("/test").permitAll()
                 .antMatchers("/api/users/kakao").permitAll()
                 .antMatchers("/api/items/**").access("hasRole('ROLE_USER')")
 
