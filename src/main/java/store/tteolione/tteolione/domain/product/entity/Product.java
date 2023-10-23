@@ -41,7 +41,6 @@ public class Product extends BaseTimeEntity {
     private double latitude; //위도
     private EProductSoldStatus soldStatus;
 
-    @Builder.Default
     @OneToMany(mappedBy = "product")
     private List<File> images = new ArrayList<>(); //마지막 인덱스가 영수증사진
 
