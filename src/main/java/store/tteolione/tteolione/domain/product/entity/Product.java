@@ -39,6 +39,8 @@ public class Product extends BaseTimeEntity {
 
     private double longitude; //경도
     private double latitude; //위도
+
+    @Enumerated(EnumType.STRING)
     private EProductSoldStatus soldStatus;
 
     @OneToMany(mappedBy = "product")

@@ -37,7 +37,11 @@ public class ProductServiceImpl implements ProductService {
 
 
         List<File> uploadPhotos = fileService.saveImages(photos);
+        for (File uploadPhoto : uploadPhotos) {
+            uploadPhoto.setProduct(product);
+        }
         File uploadReceipt = fileService.saveImage(receipt);
+        uploadReceipt.setProduct(product);
         uploadPhotos.add(uploadReceipt);
 
         product.setCategory(findCategory);

@@ -3,6 +3,7 @@ package store.tteolione.tteolione.domain.product.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.entity.Product;
 
 import javax.validation.constraints.NotBlank;
@@ -59,6 +60,7 @@ public class PostProductRequest {
                 .description(description)
                 .longitude(longitude)
                 .latitude(latitude)
+                .soldStatus(ProductConstants.EProductSoldStatus.eNew)
                 .build();
     }
 }
