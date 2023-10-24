@@ -10,12 +10,14 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class LoginResponse {
 
+    private Long userId;
     private String accessToken;
     private String refreshToken;
     private String nickname;
 
     public static LoginResponse from(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo) {
         return LoginResponse.builder()
+                .userId(Long.valueOf(userInfo.get("userId").toString()))
                 .accessToken(tokenInfoResponse.getAccessToken())
                 .refreshToken(tokenInfoResponse.getRefreshToken())
                 .nickname(userInfo.get("nickname").toString())

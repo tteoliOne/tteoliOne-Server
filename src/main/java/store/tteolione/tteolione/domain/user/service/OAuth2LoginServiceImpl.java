@@ -37,7 +37,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         KakaoUserInfoResponse kakaoResponse = kakaoInfoClient.getUserInfo("Bearer " + oAuth2KakaoRequest.getAccessToken());
 
         HashMap<String, Object> userInfo = getUserInfoHashMap(kakaoResponse);
-        saveKakao(userInfo);
+        User saveUser = saveKakao(userInfo);
+        userInfo.put("userId", saveUser.getUserId());
 
         OAuth2Attribute oAuth2Attribute = OAuth2Attribute.of("kakao", "kakao", userInfo);
         Map<String, Object> attributes = oAuth2Attribute.convertToMap();
