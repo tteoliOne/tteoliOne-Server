@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import store.tteolione.tteolione.domain.product.dto.GetSimpleProductResponse;
 import store.tteolione.tteolione.domain.product.dto.PostProductRequest;
 import store.tteolione.tteolione.domain.product.dto.PostProductResponse;
 import store.tteolione.tteolione.domain.product.service.ProductService;
@@ -21,6 +22,9 @@ public class ProductController {
     private final ProductService productService;
     private final S3Service s3Service;
 
+    /**
+     * 상품 등록
+     */
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<PostProductResponse> createProduct(@RequestPart(value = "photos") List<MultipartFile> photos,
                                                            @RequestPart(value = "receipt") MultipartFile receipt,
@@ -29,4 +33,16 @@ public class ProductController {
         PostProductResponse postProductResponse = productService.saveProduct(photos, receipt, request);
         return BaseResponse.of(postProductResponse);
     }
+
+    /**
+     * 상품 간단 조회
+     */
+    @GetMapping
+    public BaseResponse<GetSimpleProductResponse> simpleProducts(@RequestParam Long userId,
+                                                                 @RequestParam Double longitude,
+                                                                 @RequestParam Double latitude) {
+        GetSimpleProductResponse simpleProductResponse = productService.getSimpleProducts(userId, longitude, latitude);
+        return BaseResponse.of(simpleProductResponse);
+    }
+
 }
