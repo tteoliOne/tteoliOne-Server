@@ -43,6 +43,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                                         .orderBy(QFile.file.updateAt.asc())
                                 , "imageUrl"
                         ),
+                        product.title,
                         product.sharePrice.divide(product.shareCount).as("unitPrice"),
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
