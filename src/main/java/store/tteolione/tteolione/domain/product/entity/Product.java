@@ -35,6 +35,7 @@ public class Product extends BaseTimeEntity {
     private int buyCount;
     private int sharePrice;
     private int shareCount;
+    private int totalCount;
     private LocalDateTime buyDate;
 
     private double longitude; //경도
