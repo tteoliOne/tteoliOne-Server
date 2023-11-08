@@ -1,6 +1,10 @@
 package store.tteolione.tteolione.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -27,6 +32,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
 
     private final KakaoInfoClient kakaoInfoClient;
     private final UserRepository userRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RedisTemplate redisTemplate;
     private final TokenProvider tokenProvider;
 
     @Override
@@ -48,6 +55,9 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         SecurityContextHolder.getContext().setAuthentication(auth);
         TokenInfoResponse tokenInfoResponse = tokenProvider.createToken(auth);
 
+        redisTemplate.opsForValue()
+                .set("RT:" + userDetails.getAttributes().get("email"),
+                        tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         //TODO targetToken 로직
 
         return LoginResponse.from(tokenInfoResponse, userInfo);
@@ -66,4 +76,11 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
                 .orElse(User.toKakaoUser(kakaoUserInfo));
         return userRepository.save(user);
     }
+
+
+    /**
+     * validate
+     */
+
+
 }
