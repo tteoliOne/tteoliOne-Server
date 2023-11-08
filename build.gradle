@@ -75,7 +75,14 @@ dependencies {
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 	/** //queryDsl **/
 
+	//p6spy
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+
+	//email
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 

@@ -37,6 +37,14 @@ public class UserConstants {
     }
 
     @Getter
+    public enum EBaseUserInfo {
+        eBaseProfile("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/00c04127-9497-43f5-afd5-86937dba5e97.png");
+        private String value;
+        EBaseUserInfo(String value) {this.value = value;}
+    }
+
+
+    @Getter
     @AllArgsConstructor
     public enum EAuthority{
         eRoleDisabledUser("ROLE_DISABLED_USER"),
