@@ -3,6 +3,7 @@ package store.tteolione.tteolione.global.config.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -72,6 +73,11 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/api/users/kakao").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/email/send/signup").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/email/verify/signup").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/users/signup").permitAll()
+
+
                 .antMatchers("/api/items/**").access("hasRole('ROLE_USER')")
 
                 .anyRequest().authenticated()

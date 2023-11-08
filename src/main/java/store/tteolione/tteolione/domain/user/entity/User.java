@@ -1,7 +1,10 @@
 package store.tteolione.tteolione.domain.user.entity;
 
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
+import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 
 import javax.persistence.*;
 
@@ -25,7 +28,9 @@ public class User extends BaseTimeEntity {
     private Long userId;
 
     private String loginId;
+    private String password;
 
+    private String username;
     private String nickname;
     private String intro;
     private String profile;
@@ -45,10 +50,30 @@ public class User extends BaseTimeEntity {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
+    public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth) {
+        return User.builder()
+                .loginId(signUpRequest.getLoginId())
+                .email(signUpRequest.getEmail())
+                .username(signUpRequest.getUsername())
+                .nickname(signUpRequest.getNickname())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .authorities(Collections.singleton(toRoleDisabledUserAuthority()))
+                .profile(EBaseUserInfo.eBaseProfile.getValue())
+                .activated(true)
+                .emailAuthChecked(true)
+                .loginType(ELoginType.eApp)
+                .emailAuth(emailAuth)
+                .build();
+    }
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "email_auth_id")
+    private EmailAuth emailAuth;
 
     public static User toKakaoUser(HashMap<String, Object> userInfo) {
         return User.builder()
-                .loginId(EKakaoUserInfo.eKakao.getValue()+userInfo.get("email").toString())
+                .loginId(EKakaoUserInfo.eKakao.getValue() + userInfo.get("email").toString())
+                .username(userInfo.get("nickname").toString())
                 .nickname(userInfo.get("nickname").toString())
                 .profile(userInfo.get("profile").toString())
                 .email(userInfo.get("email").toString())
@@ -56,6 +81,7 @@ public class User extends BaseTimeEntity {
                 .emailAuthChecked(true)
                 .activated(true)
                 .authorities(Collections.singleton(toRoleUserAuthority()))
+                .loginType(ELoginType.eApp)
                 .build();
 
     }
