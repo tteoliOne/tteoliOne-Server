@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import store.tteolione.tteolione.domain.user.dto.TokenInfoResponse;
 
@@ -55,9 +56,9 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date accessTokenValidity = new Date(now + this.accessTokenValidityTime);
         Date refreshTokenValidity = new Date(now + this.refreshTokenValidityTime);
-
+        String subject = getSubject(authentication);
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(subject)
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(accessTokenValidity)
@@ -70,6 +71,14 @@ public class TokenProvider implements InitializingBean {
 
         return TokenInfoResponse.from("Bearer", accessToken, refreshToken, refreshTokenValidityTime);
 
+    }
+
+    private String getSubject(Authentication authentication) {
+        if (authentication.getName().equals("email")) {
+            OAuth2AuthenticationToken auth = (OAuth2AuthenticationToken) authentication;
+            return (String) auth.getPrincipal().getAttributes().get("email");
+        }
+        return authentication.getName();
     }
 
     public Authentication getAuthentication(String token) {
