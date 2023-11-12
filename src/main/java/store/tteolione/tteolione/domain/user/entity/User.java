@@ -41,6 +41,7 @@ public class User extends BaseTimeEntity {
 
     private String email;
     private boolean emailAuthChecked;
+    private String provider;
     private boolean activated;
 
     @ManyToMany
@@ -57,7 +58,7 @@ public class User extends BaseTimeEntity {
                 .username(signUpRequest.getUsername())
                 .nickname(signUpRequest.getNickname())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .authorities(Collections.singleton(toRoleDisabledUserAuthority()))
+                .authorities(Collections.singleton(toRoleUserAuthority()))
                 .profile(EBaseUserInfo.eBaseProfile.getValue())
                 .activated(true)
                 .emailAuthChecked(true)
@@ -81,7 +82,6 @@ public class User extends BaseTimeEntity {
                 .emailAuthChecked(true)
                 .activated(true)
                 .authorities(Collections.singleton(toRoleUserAuthority()))
-                .loginType(ELoginType.eApp)
                 .build();
 
     }

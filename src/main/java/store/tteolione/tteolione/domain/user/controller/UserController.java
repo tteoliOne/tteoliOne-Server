@@ -5,9 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import store.tteolione.tteolione.domain.user.dto.ReissueRequest;
-import store.tteolione.tteolione.domain.user.dto.ReissueResponse;
-import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
+import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
@@ -30,10 +28,21 @@ public class UserController {
     }
 
     /**
+     * 로그인
+     */
+    @PostMapping("/login")
+    public BaseResponse<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse loginResponse = userService.loginUser(loginRequest);
+        return BaseResponse.of(loginResponse);
+    }
+
+
+
+    /**
      * 토큰 재발행
      */
     @PostMapping("/reissue")
-    public BaseResponse<ReissueResponse> reissue(@Valid ReissueRequest reissueRequest) {
+    public BaseResponse<ReissueResponse> reissue(@Valid @RequestBody ReissueRequest reissueRequest) {
         ReissueResponse reissueResponse = userService.reissueToken(reissueRequest);
         return BaseResponse.of(reissueResponse);
     }

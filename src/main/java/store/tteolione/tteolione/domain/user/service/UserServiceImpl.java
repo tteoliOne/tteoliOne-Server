@@ -2,10 +2,11 @@ package store.tteolione.tteolione.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
-import store.tteolione.tteolione.domain.user.dto.ReissueRequest;
-import store.tteolione.tteolione.domain.user.dto.ReissueResponse;
-import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
-import store.tteolione.tteolione.domain.user.dto.TokenInfoResponse;
+import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import store.tteolione.tteolione.global.exception.GeneralException;
@@ -28,6 +26,7 @@ import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +38,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final TokenProvider tokenProvider;
     private final RedisTemplate redisTemplate;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final EmailAuthRepository emailAuthRepository;
 
     @Override
@@ -65,7 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException("유효하지 않은 Refresh Token입니다.");
         }
         Authentication authentication = tokenProvider.getAuthentication(reissueRequest.getAccessToken());
-        String refreshToken = (String) redisTemplate.opsForValue().get("RT:" + authentication.getName());
+        String refreshToken = getRefreshToken(authentication);
 
         if (ObjectUtils.isEmpty(refreshToken)) {
             throw new GeneralException("잘못된 Refresh Token입니다.");
@@ -74,10 +72,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException("일치하는 Refresh Token이 없습니다.");
         }
         TokenInfoResponse tokenInfoResponse = tokenProvider.createToken(authentication);
-        redisTemplate.opsForValue()
+        this.redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(),
-                        tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime());
+                        tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return new ReissueResponse(tokenInfoResponse.getAccessToken(), tokenInfoResponse.getRefreshToken());
+    }
+
+    private String getRefreshToken(Authentication authentication) {
+        if (authentication.getName().equals("email")) {
+//            return (String) redisTemplate.opsForValue().get("RT:" + (String) authentication.getAuthorities().getAttributes().get("email"));
+        }
+        return (String) redisTemplate.opsForValue().get("RT:" + authentication.getName());
     }
 
     @Override
@@ -126,5 +131,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 throw new GeneralException("이미 등록된 이메일입니다.");
             }
         }
+    }
+
+    @Override
+    public LoginResponse loginUser(LoginRequest loginRequest) {
+        String loginId = loginRequest.getLoginId();
+        User findUser = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new GeneralException("아이디나 비밀번호를 다시 확인해주세요."));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), findUser.getPassword())) {
+            throw new GeneralException("아이디나 비밀번호를 다시 확인해주세요.");
+        }
+        if (!findUser.isActivated()) {
+            throw new GeneralException("비활성화 유저입니다.");
+        }
+        TokenInfoResponse tokenInfoResponse = validateLogin(loginId, loginRequest.getPassword());
+
+        return LoginResponse.fromApp(findUser, tokenInfoResponse);
+    }
+
+    private TokenInfoResponse validateLogin(String loginId, String password) {
+        UserDetails userDetails = loadUserByUsername(loginId);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        TokenInfoResponse tokenInfoResponse = this.tokenProvider.createToken(authenticationToken);
+        this.redisTemplate.opsForValue()
+                .set("RT:" + authenticationToken.getName(),
+                        tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        return tokenInfoResponse;
     }
 }
