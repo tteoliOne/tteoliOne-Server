@@ -48,11 +48,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.totalCount,
-                        likes.likeStatus.as("isLiked")
+                        Expressions.as(
+                                JPAExpressions
+                                        .select(likes.likeStatus)
+                                        .from(likes)
+                                        .where(likes.product.eq(product).and(likes.user.userId.eq(userId)))
+                                , "isLiked"
+                        )
                 ))
-                .from(likes)
-                .leftJoin(likes.product, product)
-                .where(categoryEq(category), userIdEq(userId), productStatusEq(EProductSoldStatus.eNew))
+                .from(product)
+                .where(categoryEq(category), productStatusEq(EProductSoldStatus.eNew))
                 .orderBy(product.updateAt.desc())
                 .limit(5)
                 .fetch();

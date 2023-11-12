@@ -36,15 +36,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailService() {
-        UserDetails user = User.withUsername("victor")
-                .password("oladipo")
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -76,6 +67,8 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.POST,  "/api/email/send/signup").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/email/verify/signup").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/users/signup").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/users/login").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/users/reissue").permitAll()
 
 
                 .antMatchers("/api/items/**").access("hasRole('ROLE_USER')")

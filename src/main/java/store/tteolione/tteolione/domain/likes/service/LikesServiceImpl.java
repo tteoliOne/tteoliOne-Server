@@ -29,7 +29,6 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     public int getTotalLikes(Product product) {
-        System.out.println(LikesConstants.ELikeStatus.eLIKED.isLikeStatus());
         return likesRepository.countByProductAndLikeStatus(product, LikesConstants.ELikeStatus.eLIKED.isLikeStatus());
     }
 }

@@ -1,8 +1,6 @@
 package store.tteolione.tteolione.domain.user.service;
 
-import store.tteolione.tteolione.domain.user.dto.ReissueRequest;
-import store.tteolione.tteolione.domain.user.dto.ReissueResponse;
-import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
+import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 
 public interface UserService {
@@ -11,4 +9,6 @@ public interface UserService {
     ReissueResponse reissueToken(ReissueRequest reissueRequest);
     void signUpUser(SignUpRequest signUpRequest);
     void validateIsAlreadyRegisteredEmail(String email);
+
+    LoginResponse loginUser(LoginRequest loginRequest);
 }
