@@ -34,10 +34,8 @@ public class S3Service {
         String ext = originalFilename.substring(index + 1);
 
         String storeFileName = UUID.randomUUID() + "." + ext;
-        System.out.println(storeFileName);
 
         String key = "test/" + storeFileName; //TODO test 대신에 사용할 것 찾기
-        System.out.println(key);
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
