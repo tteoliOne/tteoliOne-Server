@@ -92,7 +92,7 @@ public class EmailServiceImpl implements EmailService {
             authCode += (char) index;
         }
 
-        int numIndex = random.nextInt(9999) + 1000;
+        int numIndex = random.nextInt(9000) + 1000;
         authCode += numIndex;
 
         return authCode;
