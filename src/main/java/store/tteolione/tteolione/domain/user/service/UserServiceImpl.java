@@ -127,16 +127,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-//    @Override
-//    public void validateIsAlreadyRegisteredEmail(String email) {
-//        Optional<User> findUser = userRepository.findByEmailAndLoginType(email, UserConstants.ELoginType.eApp);
-//        if (findUser.isPresent()) {
-//            User user = findUser.get();
-//            if (user.isEmailAuthChecked()) {
-//                throw new GeneralException("이미 등록된 이메일입니다.");
-//            }
-//        }
-//    }
+    @Override
+    public void validateIsAlreadyRegisteredEmail(String email) {
+        Optional<User> findUser = userRepository.findByEmailAndLoginType(email, UserConstants.ELoginType.eApp);
+        if (findUser.isPresent()) {
+            User user = findUser.get();
+            if (user.isEmailAuthChecked()) {
+                throw new GeneralException("이미 등록된 이메일입니다.");
+            }
+        }
+    }
 
     @Override
     public LoginResponse loginUser(LoginRequest loginRequest) {
