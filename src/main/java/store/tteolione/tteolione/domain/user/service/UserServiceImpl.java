@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         //이미 등록된 회원인지
         validateIsAlreadyRegisteredUser(signUpRequest.getEmail());
         //이미 이메일이 있는지
-        validateIsAlreadyRegisteredEmail(signUpRequest.getEmail());
+//        validateIsAlreadyRegisteredEmail(signUpRequest.getEmail());
         //보낸 이메일이 인증되었는지 확인
         EmailAuth findEmailAuth = validateEmailAuthEntity(signUpRequest.getEmail());
 
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private EmailAuth validateEmailAuthEntity(String email) {
-        EmailAuth emailAuth = emailAuthRepository.findByEmail(email)
+        EmailAuth emailAuth = emailAuthRepository.findTopByEmailOrderByUpdateAtDesc(email)
                 .orElseThrow(() -> new GeneralException("본인인증 버튼을 눌러주세요.")); //이메일 전송도 안되었을때
         if (!emailAuth.isEmailAuthChecked()) {
             throw new GeneralException("이메일 인증이 되어있지 않습니다.");
@@ -113,11 +113,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void validateIsAlreadyRegisteredUser(String email) {
-        Optional<User> findUser = userRepository.findByEmailAndLoginType(email, UserConstants.ELoginType.eApp);
+        Optional<User> findUser = userRepository.findByEmail(email);
         if (findUser.isPresent()) {
             User user = findUser.get();
             if (user.isEmailAuthChecked()) {
-                throw new GeneralException("이미 등록된 회원입니다.");
+                switch (user.getLoginType()) {
+                    case eApp -> throw new GeneralException("이미 회원가입한 회원입니다.");
+                    case eKakao -> throw new GeneralException("이미 카카오로 로그인한 회원입니다.");
+                    case eGoogle -> throw new GeneralException("이미 구글로 로그인한 회원입니다.");
+                    case eNaver -> throw new GeneralException("이미 네이버로 로그인한 회원입니다.");
+                }
             }
         }
     }
