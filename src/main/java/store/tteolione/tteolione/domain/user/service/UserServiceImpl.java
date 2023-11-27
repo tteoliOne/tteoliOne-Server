@@ -154,6 +154,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return LoginResponse.fromApp(findUser, tokenInfoResponse);
     }
 
+    @Override
+    public void duplicateNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new GeneralException("중복된 닉네임입니다.");
+        }
+    }
+
+    @Override
+    public void duplicateLoginId(String loginId) {
+        if (userRepository.existsByLoginId(loginId)) {
+            throw new GeneralException("중복된 아이디입니다.");
+        }
+    }
+
     private TokenInfoResponse validateLogin(String loginId, String password) {
         UserDetails userDetails = loadUserByUsername(loginId);
         UsernamePasswordAuthenticationToken authenticationToken =
