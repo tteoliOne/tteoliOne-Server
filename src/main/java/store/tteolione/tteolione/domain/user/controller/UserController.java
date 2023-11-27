@@ -1,10 +1,7 @@
 package store.tteolione.tteolione.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
@@ -34,6 +31,24 @@ public class UserController {
     public BaseResponse<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = userService.loginUser(loginRequest);
         return BaseResponse.of(loginResponse);
+    }
+
+    /**
+     * 닉네임 중복 확인
+     */
+    @PostMapping("/check/nickname")
+    public BaseResponse<String> duplicateNickname(@Valid @RequestBody DupNicknameRequest dupNicknameRequest) {
+        userService.duplicateNickname(dupNicknameRequest.getNickname());
+        return BaseResponse.of("사용가능한 닉네임입니다.");
+    }
+
+    /**
+     * 아이디 중복 확인
+     */
+    @PostMapping("/check/login-id")
+    public BaseResponse<String> duplicateLoginId(@Valid @RequestBody DupLoginIdRequest dupLoginIdRequest) {
+        userService.duplicateLoginId(dupLoginIdRequest.getLoginId());
+        return BaseResponse.of("사용가능한 아이디입니다.");
     }
 
 

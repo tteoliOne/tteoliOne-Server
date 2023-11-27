@@ -11,4 +11,8 @@ public interface UserService {
     void validateIsAlreadyRegisteredEmail(String email);
 
     LoginResponse loginUser(LoginRequest loginRequest);
+
+    void duplicateNickname(String nickname);
+
+    void duplicateLoginId(String loginId);
 }
