@@ -15,9 +15,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -33,6 +33,12 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailAuth(SendEmailRequest sendEmailRequest) throws Exception {
         userService.validateIsAlreadyRegisteredUser(sendEmailRequest.getEmail());
+        Optional<EmailAuth> _findEmailAuth = emailAuthRepository.findByEmail(sendEmailRequest.getEmail());
+        if (_findEmailAuth.isPresent()) {
+            //이메일이 존재한다면 제거
+            EmailAuth findEmailAuth = _findEmailAuth.get();
+            emailAuthRepository.delete(findEmailAuth);
+        }
         try {
             MimeMessage message = createEmailContent(sendEmailRequest.getEmail());
             javaMailSender.send(message);
@@ -45,7 +51,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void verifyEmailCode(VerifyEmailRequest verifyEmailRequest) {
-        EmailAuth emailAuth = emailAuthRepository.findByAuthCode(verifyEmailRequest.getAuthCode())
+        EmailAuth emailAuth = emailAuthRepository.findByEmailAndAuthCode(verifyEmailRequest.getEmail(), verifyEmailRequest.getAuthCode())
                 .orElseThrow(() -> new GeneralException("인증코드를 찾을 수 없습니다."));
         LocalDateTime createAt = emailAuth.getCreateAt();
         LocalDateTime currentAt = LocalDateTime.now();
