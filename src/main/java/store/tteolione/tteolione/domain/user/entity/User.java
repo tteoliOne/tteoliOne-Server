@@ -73,7 +73,7 @@ public class User extends BaseTimeEntity {
 
     public static User toKakaoUser(HashMap<String, Object> userInfo) {
         return User.builder()
-                .loginId(EKakaoUserInfo.eKakao.getValue() + userInfo.get("email").toString())
+                .loginId(userInfo.get("email").toString())
                 .username(userInfo.get("nickname").toString())
                 .nickname(userInfo.get("nickname").toString())
                 .profile(userInfo.get("profile").toString())

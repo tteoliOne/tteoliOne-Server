@@ -168,6 +168,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
+    @Override
+    public User findByUsername(String loginId) {
+        return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException("존재하지 않는 회원입니다."));
+    }
+
     private TokenInfoResponse validateLogin(String loginId, String password) {
         UserDetails userDetails = loadUserByUsername(loginId);
         UsernamePasswordAuthenticationToken authenticationToken =

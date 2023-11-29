@@ -3,6 +3,8 @@ package store.tteolione.tteolione.domain.user.service;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 
+import java.util.Optional;
+
 public interface UserService {
     User findByUserId(Long userId);
     void validateIsAlreadyRegisteredUser(String email);
@@ -15,4 +17,6 @@ public interface UserService {
     void duplicateNickname(String nickname);
 
     void duplicateLoginId(String loginId);
+
+    User findByUsername(String loginId);
 }

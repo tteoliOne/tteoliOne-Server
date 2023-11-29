@@ -9,7 +9,5 @@ import store.tteolione.tteolione.domain.user.entity.User;
 import java.util.Optional;
 
 public interface LikesRepository extends JpaRepository<Likes, Long> {
-    Optional<Likes> findByUserAndProduct(User user, Product product);
-
-    int countByProductAndLikeStatus(Product product, boolean status);
+    Optional<Likes> findByProductAndUser(Product product, User user);
 }

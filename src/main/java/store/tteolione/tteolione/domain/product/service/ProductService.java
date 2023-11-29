@@ -13,4 +13,6 @@ public interface ProductService {
     PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException;
 
     GetSimpleProductResponse getSimpleProducts(Long userId, double longitude, double latitude);
+
+    String likeProduct(Long productId);
 }

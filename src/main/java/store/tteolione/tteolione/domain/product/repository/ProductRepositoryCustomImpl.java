@@ -47,7 +47,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         product.sharePrice.divide(product.shareCount).as("unitPrice"),
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
-                        product.totalCount,
+                        product.likeCount.as("totalLikes"),
                         Expressions.as(
                                 JPAExpressions
                                         .select(likes.likeStatus)
