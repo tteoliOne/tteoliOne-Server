@@ -37,6 +37,7 @@ public class Product extends BaseTimeEntity {
     private int shareCount;
     private int totalCount;
     private LocalDateTime buyDate;
+    private Integer likeCount;
 
     private double longitude; //경도
     private double latitude; //위도
@@ -67,6 +68,7 @@ public class Product extends BaseTimeEntity {
         this.latitude = latitude;
         this.user = user;
         this.category = category;
+        this.likeCount = 0;
     }
 
     //연관관계 메서드

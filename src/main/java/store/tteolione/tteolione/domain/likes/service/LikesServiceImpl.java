@@ -2,6 +2,7 @@ package store.tteolione.tteolione.domain.likes.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.likes.constants.LikesConstants;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.likes.repository.LikesRepository;
@@ -11,24 +12,28 @@ import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LikesServiceImpl implements LikesService {
 
     private final LikesRepository likesRepository;
 
-    @Override
-    public Likes modifyLike(User user, Product product) {
-        Likes findLike = likesRepository.findByUserAndProduct(user, product)
-                .orElseGet(() -> likesRepository.save(Likes.toEntity(user, product)));
 
-        findLike.toggleLike();
-        return findLike;
+    @Override
+    public Optional<Likes> findByProductAndUser(Product product, User user) {
+        return likesRepository.findByProductAndUser(product, user);
     }
 
     @Override
-    public int getTotalLikes(Product product) {
-        return likesRepository.countByProductAndLikeStatus(product, LikesConstants.ELikeStatus.eLIKED.isLikeStatus());
+    public void createLikes(Likes likes) {
+        likesRepository.save(likes);
+    }
+
+    @Override
+    public void deleteLikes(Likes likes) {
+        likesRepository.delete(likes);
     }
 }

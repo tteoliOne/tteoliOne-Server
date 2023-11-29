@@ -3,6 +3,7 @@ package store.tteolione.tteolione.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +52,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         OAuth2AuthenticationToken auth = new OAuth2AuthenticationToken(userDetails, authorities, "key");
         auth.setDetails(userDetails);
         SecurityContextHolder.getContext().setAuthentication(auth);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("authentication = " + authentication);
         TokenInfoResponse tokenInfoResponse = tokenProvider.createToken(auth);
         redisTemplate.opsForValue()
                 .set("RT:" + (String) auth.getPrincipal().getAttributes().get("email"),

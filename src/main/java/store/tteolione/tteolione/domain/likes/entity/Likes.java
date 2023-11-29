@@ -41,12 +41,9 @@ public class Likes extends BaseTimeEntity {
                 .build();
     }
 
-    public void toggleLike() {
-        if (this.likeStatus == ELikeStatus.eLIKED.isLikeStatus()) {
-            this.likeStatus = ELikeStatus.eNOT_LIKED.isLikeStatus();
-        } else {
-            this.likeStatus = ELikeStatus.eLIKED.isLikeStatus();
-        }
+    public void unLikeProduct(Product product) {
+        this.likeStatus = ELikeStatus.eNOT_LIKED.isLikeStatus();
+        product.setLikeCount(product.getLikeCount() - 1);
     }
 
 }

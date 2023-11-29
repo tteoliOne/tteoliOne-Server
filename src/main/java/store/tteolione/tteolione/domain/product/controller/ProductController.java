@@ -45,4 +45,14 @@ public class ProductController {
         return BaseResponse.of(simpleProductResponse);
     }
 
+    /**
+     * 좋아요 추가 취소
+     */
+    @PostMapping("/{productId}/likes")
+    public BaseResponse<String> likeProduct(@PathVariable Long productId) {
+        String result = productService.likeProduct(productId);
+        return BaseResponse.of(result);
+    }
+
+
 }
