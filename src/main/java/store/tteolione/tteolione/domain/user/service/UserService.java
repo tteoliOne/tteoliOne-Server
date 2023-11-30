@@ -19,4 +19,8 @@ public interface UserService {
     void duplicateLoginId(String loginId);
 
     User findByUsername(String loginId);
+
+    String findLoginId(FindIdRequest findIdRequest) throws Exception;
+
+    VerifyLoginIdResponse verifyLoginId(VerifyLoginIdRequest verifyLoginIdRequest);
 }

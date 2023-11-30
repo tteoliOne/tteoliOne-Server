@@ -20,8 +20,10 @@ import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
+import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
+import store.tteolione.tteolione.infra.email.service.EmailService;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RedisTemplate redisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthRepository emailAuthRepository;
+    private final EmailService emailService;
 
     @Override
     public UserDetails loadUserByUsername(final String loginId) {
@@ -172,6 +175,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User findByUsername(String loginId) {
         return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException("존재하지 않는 회원입니다."));
     }
+
+    @Override
+    public String findLoginId(FindIdRequest findIdRequest) throws Exception {
+        User findUser = userRepository.findByUsernameAndEmail(findIdRequest.getUsername(), findIdRequest.getEmail())
+                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+        switch (findUser.getLoginType()) {
+            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
+            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
+            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+        }
+        emailService.sendEmailAuth(findIdRequest.getEmail());
+        return "이메일 전송 성공";
+    }
+
+    @Override
+    public VerifyLoginIdResponse verifyLoginId(VerifyLoginIdRequest verifyLoginIdRequest) {
+        boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyLoginIdRequest.getAuthCode(), verifyLoginIdRequest.getEmail()));
+        if (!isVerify) {
+            throw new GeneralException("이메일 검증 실패");
+        }
+        User findUser = userRepository.findByUsernameAndEmail(verifyLoginIdRequest.getUsername(), verifyLoginIdRequest.getEmail())
+                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+        return new VerifyLoginIdResponse(findUser.getLoginId());
+    }
+
 
     private TokenInfoResponse validateLogin(String loginId, String password) {
         UserDetails userDetails = loadUserByUsername(loginId);
