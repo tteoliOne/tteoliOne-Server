@@ -51,6 +51,21 @@ public class UserController {
         return BaseResponse.of("사용가능한 아이디입니다.");
     }
 
+    /**
+     * 아이디 찾기
+     */
+    @PostMapping("/find/login-id")
+    public BaseResponse<String> findLoginId(@RequestBody FindIdRequest findIdRequest) throws Exception {
+        return BaseResponse.of(userService.findLoginId(findIdRequest));
+    }
+
+    /**
+     * 아이디 이메일 검증
+     */
+    @PostMapping("/verify/login-id")
+    public BaseResponse<VerifyLoginIdResponse> findLoginId(@RequestBody VerifyLoginIdRequest verifyLoginIdRequest) throws Exception {
+        return BaseResponse.of(userService.verifyLoginId(verifyLoginIdRequest));
+    }
 
 
     /**

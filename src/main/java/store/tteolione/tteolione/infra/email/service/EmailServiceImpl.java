@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import store.tteolione.tteolione.domain.user.service.UserService;
+import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.exception.GeneralException;
-import store.tteolione.tteolione.infra.email.dto.SendEmailRequest;
 import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
@@ -26,23 +25,25 @@ import java.util.Random;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
-    private final UserService userService;
     private final EmailAuthRepository emailAuthRepository;
     private String authCode;
 
     @Override
-    public void sendEmailAuth(SendEmailRequest sendEmailRequest) throws Exception {
-        userService.validateIsAlreadyRegisteredUser(sendEmailRequest.getEmail());
-        Optional<EmailAuth> _findEmailAuth = emailAuthRepository.findByEmail(sendEmailRequest.getEmail());
+    public void sendEmailAuth(String email) throws Exception {
+        Optional<EmailAuth> _findEmailAuth = emailAuthRepository.findByEmail(email);
         if (_findEmailAuth.isPresent()) {
             //이메일이 존재한다면 제거
             EmailAuth findEmailAuth = _findEmailAuth.get();
+            User findUser = findEmailAuth.getUser();
+            if (findUser != null) {
+                findUser.setEmailAuth(null);
+            }
             emailAuthRepository.delete(findEmailAuth);
         }
         try {
-            MimeMessage message = createEmailContent(sendEmailRequest.getEmail());
+            MimeMessage message = createEmailContent(email);
             javaMailSender.send(message);
-            EmailAuth emailAuth = EmailAuth.createEmailAuth(sendEmailRequest.getEmail(), authCode);
+            EmailAuth emailAuth = EmailAuth.createEmailAuth(email, authCode);
             emailAuthRepository.save(emailAuth);
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void verifyEmailCode(VerifyEmailRequest verifyEmailRequest) {
+    public boolean verifyEmailCode(VerifyEmailRequest verifyEmailRequest) {
         EmailAuth emailAuth = emailAuthRepository.findByEmailAndAuthCode(verifyEmailRequest.getEmail(), verifyEmailRequest.getAuthCode())
                 .orElseThrow(() -> new GeneralException("인증코드를 찾을 수 없습니다."));
         LocalDateTime createAt = emailAuth.getCreateAt();
@@ -59,6 +60,7 @@ public class EmailServiceImpl implements EmailService {
             throw new GeneralException("인증코드 유효한 시간인 10분을 초과했습니다.");
         }
         emailAuth.verifyEmail();
+        return true;
     }
 
     private MimeMessage createEmailContent(String email) throws Exception {
