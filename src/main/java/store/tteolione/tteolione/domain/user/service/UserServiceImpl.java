@@ -18,6 +18,7 @@ import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
+import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
 import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
@@ -198,6 +199,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User findUser = userRepository.findByUsernameAndEmail(verifyLoginIdRequest.getUsername(), verifyLoginIdRequest.getEmail())
                 .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
         return new VerifyLoginIdResponse(findUser.getLoginId());
+    }
+
+    @Override
+    public String findPassword(FindPasswordRequest findPasswordRequest) throws Exception {
+        User findUser = userRepository.findByUsernameAndEmailAndLoginId(findPasswordRequest.getUsername(), findPasswordRequest.getEmail(), findPasswordRequest.getLoginId())
+                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+        switch (findUser.getLoginType()) {
+            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
+            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
+            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+        }
+        emailService.sendEmailAuth(findPasswordRequest.getEmail());
+        return "이메일 전송 성공";
+    }
+
+    @Override
+    public String verifyPassword(VerifyPasswordRequest verifyPasswordRequest) {
+        boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyPasswordRequest.getAuthCode(), verifyPasswordRequest.getEmail()));
+        if (!isVerify) {
+            throw new GeneralException("이메일 검증 실패");
+        }
+        userRepository.findByUsernameAndEmailAndLoginId(verifyPasswordRequest.getUsername(), verifyPasswordRequest.getEmail(), verifyPasswordRequest.getLoginId())
+                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+        return "비밀번호 이메일 검증 성공";
+    }
+
+    @Override
+    public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        User findUser = userRepository.findByUsernameAndEmailAndLoginId(resetPasswordRequest.getUsername(), resetPasswordRequest.getEmail(), resetPasswordRequest.getLoginId())
+                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+        switch (findUser.getLoginType()) {
+            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
+            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
+            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+        }
+        if (passwordEncoder.matches(resetPasswordRequest.getPassword(), findUser.getPassword())) {
+            throw new GeneralException(Code.MATCH_EXIST_PW, "기존 비밀번호와 일치합니다.");
+        }
+        findUser.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+
+        return "비밀번호 재설정 성공";
     }
 
 

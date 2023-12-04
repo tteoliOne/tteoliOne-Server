@@ -22,6 +22,7 @@ public enum Code {
 
     OK(0, HttpStatus.OK, "Ok"),
     EXISTS_USER(101, HttpStatus.UNAUTHORIZED, "User exists"),
+    MATCH_EXIST_PW(3000, HttpStatus.UNAUTHORIZED, "기존 비밀번호와 일치합니다."),
 
     BAD_REQUEST(10000, HttpStatus.BAD_REQUEST, "Bad request"),
     VALIDATION_ERROR(10001, HttpStatus.BAD_REQUEST, "Validation error"),

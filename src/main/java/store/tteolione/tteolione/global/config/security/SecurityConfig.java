@@ -73,6 +73,9 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.POST,  "/api/users/check/login-id").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/users/find/login-id").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/users/verify/login-id").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/users/find/password").permitAll()
+                .antMatchers(HttpMethod.POST,  "/api/users/verify/password").permitAll()
+                .antMatchers(HttpMethod.PATCH,  "/api/users/reset/password").permitAll()
 
 
                 .antMatchers("/api/items/**").access("hasRole('ROLE_USER')")
