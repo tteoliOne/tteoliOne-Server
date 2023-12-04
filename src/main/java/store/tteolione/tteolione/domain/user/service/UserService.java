@@ -23,4 +23,10 @@ public interface UserService {
     String findLoginId(FindIdRequest findIdRequest) throws Exception;
 
     VerifyLoginIdResponse verifyLoginId(VerifyLoginIdRequest verifyLoginIdRequest);
+
+    String findPassword(FindPasswordRequest findPasswordRequest) throws Exception;
+
+    String verifyPassword(VerifyPasswordRequest verifyPasswordRequest);
+
+    String resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

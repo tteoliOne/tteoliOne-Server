@@ -55,7 +55,7 @@ public class UserController {
      * 아이디 찾기
      */
     @PostMapping("/find/login-id")
-    public BaseResponse<String> findLoginId(@RequestBody FindIdRequest findIdRequest) throws Exception {
+    public BaseResponse<String> findLoginId(@Valid @RequestBody FindIdRequest findIdRequest) throws Exception {
         return BaseResponse.of(userService.findLoginId(findIdRequest));
     }
 
@@ -63,8 +63,32 @@ public class UserController {
      * 아이디 이메일 검증
      */
     @PostMapping("/verify/login-id")
-    public BaseResponse<VerifyLoginIdResponse> findLoginId(@RequestBody VerifyLoginIdRequest verifyLoginIdRequest) throws Exception {
+    public BaseResponse<VerifyLoginIdResponse> findLoginId(@Valid @RequestBody VerifyLoginIdRequest verifyLoginIdRequest) throws Exception {
         return BaseResponse.of(userService.verifyLoginId(verifyLoginIdRequest));
+    }
+
+    /**
+     * 비밀번호 찾기
+     */
+    @PostMapping("/find/password")
+    public BaseResponse<String> findPassword(@Valid @RequestBody FindPasswordRequest findPasswordRequest) throws Exception {
+        return BaseResponse.of(userService.findPassword(findPasswordRequest));
+    }
+
+    /**
+     * 비밀번호 이메일 검증
+     */
+    @PostMapping("/verify/password")
+    public BaseResponse<String> verifyPassword(@Valid @RequestBody VerifyPasswordRequest verifyPasswordRequest) {
+        return BaseResponse.of(userService.verifyPassword(verifyPasswordRequest));
+    }
+
+    /**
+     * 비밀번호 재설정
+     */
+    @PatchMapping("/reset/password")
+    public BaseResponse<String> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        return BaseResponse.of(userService.resetPassword(resetPasswordRequest));
     }
 
 
