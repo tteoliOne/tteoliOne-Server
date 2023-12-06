@@ -12,6 +12,7 @@ import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,5 +36,10 @@ public class LikesServiceImpl implements LikesService {
     @Override
     public void deleteLikes(Likes likes) {
         likesRepository.delete(likes);
+    }
+
+    @Override
+    public List<Likes> savedProducts(User user) {
+        return likesRepository.savedProducts(user);
     }
 }

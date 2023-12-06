@@ -14,4 +14,5 @@ import static store.tteolione.tteolione.domain.product.constants.ProductConstant
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
     @Query("select p from Product p join p.category where p.category = :category and p.soldStatus = :eProductSoldStatus order by p.updateAt desc")
     List<Product> findByCategoryAndSoldStatus(@Param("category") Category category, @Param("eProductSoldStatus") EProductSoldStatus eProductSoldStatus);
+
 }

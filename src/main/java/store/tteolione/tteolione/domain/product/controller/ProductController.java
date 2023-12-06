@@ -7,10 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.product.dto.GetSimpleProductResponse;
 import store.tteolione.tteolione.domain.product.dto.PostProductRequest;
 import store.tteolione.tteolione.domain.product.dto.PostProductResponse;
+import store.tteolione.tteolione.domain.product.dto.PostSaveProductResponse;
 import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 import store.tteolione.tteolione.global.service.S3Service;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,5 +56,12 @@ public class ProductController {
         return BaseResponse.of(result);
     }
 
-
+    /**
+     * 저장 목록 조회
+     */
+    @GetMapping("/saved")
+    public BaseResponse<PostSaveProductResponse> savedProducts(){
+        PostSaveProductResponse postSaveProductResponse = productService.savedList();
+        return BaseResponse.of(postSaveProductResponse);
+    }
 }

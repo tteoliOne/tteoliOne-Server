@@ -95,4 +95,13 @@ public class ProductServiceImpl implements ProductService {
             return "좋아요 취소 성공";
         }
     }
+
+    @Override
+    public PostSaveProductResponse savedList() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+        List<Likes> likes = likesService.savedProducts(user);
+        PostSaveProductResponse data = PostSaveProductResponse.toData(likes);
+        return data;
+    }
 }
