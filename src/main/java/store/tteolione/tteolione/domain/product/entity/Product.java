@@ -86,4 +86,22 @@ public class Product extends BaseTimeEntity {
             this.getImages().add(image);
         }
     }
+
+    public List<String> productImages() {
+        List<String> productUrls = new ArrayList<>();
+
+        for (int i = 0; i < images.size() - 1; i++) {
+            productUrls.add(images.get(i).getFileUrl());
+        }
+
+        return productUrls;
+    }
+
+    public String productProfile() {
+        return images.get(0).getFileUrl();
+    }
+
+    public String receiptImage() {
+        return images.get(images.size() - 1).getFileUrl();
+    }
 }

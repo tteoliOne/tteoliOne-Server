@@ -6,6 +6,7 @@ import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Builder
