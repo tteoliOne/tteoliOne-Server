@@ -60,6 +60,7 @@ public class PostProductRequest {
                 .description(description)
                 .longitude(longitude)
                 .latitude(latitude)
+                .likeCount(0)
                 .soldStatus(ProductConstants.EProductSoldStatus.eNew)
                 .build();
     }
