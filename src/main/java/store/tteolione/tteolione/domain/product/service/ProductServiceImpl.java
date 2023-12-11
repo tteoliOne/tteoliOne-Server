@@ -40,7 +40,8 @@ public class ProductServiceImpl implements ProductService {
     public PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
         Product product = postProductRequest.toEntity();
 
-        User findUser = userService.findByUserId(postProductRequest.getUserId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User findUser = userService.findByUsername(authentication.getName());
         Category findCategory = categoryService.findByCategoryId(postProductRequest.getCategoryId());
 
 
