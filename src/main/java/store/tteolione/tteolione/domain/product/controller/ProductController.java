@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import store.tteolione.tteolione.domain.product.dto.GetSimpleProductResponse;
-import store.tteolione.tteolione.domain.product.dto.PostProductRequest;
-import store.tteolione.tteolione.domain.product.dto.PostProductResponse;
-import store.tteolione.tteolione.domain.product.dto.PostSaveProductResponse;
+import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 import store.tteolione.tteolione.global.service.S3Service;
@@ -63,5 +60,14 @@ public class ProductController {
     public BaseResponse<PostSaveProductResponse> savedProducts(){
         PostSaveProductResponse postSaveProductResponse = productService.savedList();
         return BaseResponse.of(postSaveProductResponse);
+    }
+
+    /**
+     * 상세 목록 조회
+     */
+    @GetMapping("/{productId}")
+    public BaseResponse<DetailProductResponse> detailProduct(@PathVariable Long productId) {
+
+        return BaseResponse.of(productService.detailProduct(productId));
     }
 }

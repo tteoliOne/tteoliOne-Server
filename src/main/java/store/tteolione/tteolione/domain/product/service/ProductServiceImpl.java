@@ -104,4 +104,16 @@ public class ProductServiceImpl implements ProductService {
         PostSaveProductResponse data = PostSaveProductResponse.toData(likes);
         return data;
     }
+
+    @Override
+    public DetailProductResponse detailProduct(Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User buyer = userService.findByUsername(authentication.getName());
+        Product detailProduct = productRepository.findByDetailProduct(productId);
+        List<String> productImages = detailProduct.productImages();
+        String receiptImage = detailProduct.receiptImage();
+        Likes likes = likesService.findByProductAndUser(detailProduct, buyer).orElse(null);
+        DetailProductResponse data = DetailProductResponse.toData(detailProduct, buyer, productImages, receiptImage, likes);
+        return data;
+    }
 }

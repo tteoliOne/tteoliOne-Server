@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.entity.Product;
+import store.tteolione.tteolione.domain.user.entity.User;
 
 import java.util.List;
 
@@ -14,5 +15,8 @@ import static store.tteolione.tteolione.domain.product.constants.ProductConstant
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
     @Query("select p from Product p join p.category where p.category = :category and p.soldStatus = :eProductSoldStatus order by p.updateAt desc")
     List<Product> findByCategoryAndSoldStatus(@Param("category") Category category, @Param("eProductSoldStatus") EProductSoldStatus eProductSoldStatus);
+
+    @Query("select p from Product p join fetch p.user where p.productId = :productId")
+    Product findByDetailProduct(@Param("productId") Long productId);
 
 }

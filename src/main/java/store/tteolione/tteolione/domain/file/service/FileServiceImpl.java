@@ -43,4 +43,9 @@ public class FileServiceImpl implements FileService {
         return saveImage;
     }
 
+    @Override
+    public List<File> findByProductImages(Product product) {
+        return fileRepository.findByProductImages(product);
+    }
+
 }
