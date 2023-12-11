@@ -15,9 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostProductRequest {
 
-    @NotBlank(message = "사용자 Id를 입력해주세요.")
-    private Long userId;
-
     @NotBlank(message = "카테고리 Id를 입력해주세요.")
     private Long categoryId;
 

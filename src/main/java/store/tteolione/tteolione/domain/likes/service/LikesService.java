@@ -1,7 +1,6 @@
 package store.tteolione.tteolione.domain.likes.service;
 
 
-import org.springframework.data.jpa.repository.Query;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.user.entity.User;

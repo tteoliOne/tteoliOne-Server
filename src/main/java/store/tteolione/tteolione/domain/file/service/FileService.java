@@ -11,4 +11,6 @@ public interface FileService {
 
     List<File> saveImages(List<MultipartFile> multipartFiles) throws IOException;
     File saveImage(MultipartFile multipartFiles) throws IOException;
+
+    List<File> findByProductImages(Product product);
 }

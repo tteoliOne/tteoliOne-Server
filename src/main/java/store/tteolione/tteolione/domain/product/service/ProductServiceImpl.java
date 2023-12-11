@@ -40,7 +40,8 @@ public class ProductServiceImpl implements ProductService {
     public PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
         Product product = postProductRequest.toEntity();
 
-        User findUser = userService.findByUserId(postProductRequest.getUserId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User findUser = userService.findByUsername(authentication.getName());
         Category findCategory = categoryService.findByCategoryId(postProductRequest.getCategoryId());
 
 
@@ -102,6 +103,18 @@ public class ProductServiceImpl implements ProductService {
         User user = userService.findByUsername(authentication.getName());
         List<Likes> likes = likesService.savedProducts(user);
         PostSaveProductResponse data = PostSaveProductResponse.toData(likes);
+        return data;
+    }
+
+    @Override
+    public DetailProductResponse detailProduct(Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User buyer = userService.findByUsername(authentication.getName());
+        Product detailProduct = productRepository.findByDetailProduct(productId);
+        List<String> productImages = detailProduct.productImages();
+        String receiptImage = detailProduct.receiptImage();
+        Likes likes = likesService.findByProductAndUser(detailProduct, buyer).orElse(null);
+        DetailProductResponse data = DetailProductResponse.toData(detailProduct, buyer, productImages, receiptImage, likes);
         return data;
     }
 }
