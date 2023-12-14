@@ -57,7 +57,7 @@ public class ProductController {
      * 저장 목록 조회
      */
     @GetMapping("/saved")
-    public BaseResponse<PostSaveProductResponse> savedProducts(){
+    public BaseResponse<PostSaveProductResponse> savedProducts() {
         PostSaveProductResponse postSaveProductResponse = productService.savedList();
         return BaseResponse.of(postSaveProductResponse);
     }
@@ -69,5 +69,14 @@ public class ProductController {
     public BaseResponse<DetailProductResponse> detailProduct(@PathVariable Long productId) {
 
         return BaseResponse.of(productService.detailProduct(productId));
+    }
+
+    /**
+     * 상품 삭제
+     */
+    @DeleteMapping("/{productId}")
+    public BaseResponse<String> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return BaseResponse.of("정상적으로 삭제되었습니다.");
     }
 }

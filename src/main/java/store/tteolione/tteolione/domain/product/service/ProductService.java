@@ -17,4 +17,6 @@ public interface ProductService {
     PostSaveProductResponse savedList();
 
     DetailProductResponse detailProduct(Long productId);
+
+    void deleteProduct(Long productId);
 }

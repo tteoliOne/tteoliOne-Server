@@ -18,6 +18,7 @@ import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
+import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 
 import java.io.IOException;
@@ -116,5 +117,16 @@ public class ProductServiceImpl implements ProductService {
         Likes likes = likesService.findByProductAndUser(detailProduct, buyer).orElse(null);
         DetailProductResponse data = DetailProductResponse.toData(detailProduct, buyer, productImages, receiptImage, likes);
         return data;
+    }
+
+    @Override
+    public void deleteProduct(Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+        Product product = productRepository.findByDetailProduct(productId);
+        if (!user.getUserId().equals(product.getUser().getUserId())) {
+            throw new GeneralException(Code.MATCH_PRODUCT_USER);
+        }
+        product.setStatus("DELETE");
     }
 }
