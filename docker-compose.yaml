@@ -1,0 +1,39 @@
+version: '3'
+services:
+  server:
+    container_name: server
+    image: anwooseong/tteolione-server
+    expose:
+      - 8081
+    ports:
+      - 8081:8081
+    restart: "always"
+    environment:
+      TZ: "Asia/Seoul" # timezone 설정
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    hostname: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+  nginx:
+    container_name: nginx
+    image: anwooseong/tteolione-nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    depends_on:
+      - "server"
+    environment:
+      TZ: "Asia/Seoul" # timezone 설정
+
+volumes:
+  redis-data:
