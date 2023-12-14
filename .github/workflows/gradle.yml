@@ -100,7 +100,6 @@ jobs:
           source: "/github/workspace/.env"
           target: "/home/ubuntu/"
 
-
       ## docker compose up
       # HOST : 인스턴스 주소
       # KEY : rsa - 전부 복사, % 제외
