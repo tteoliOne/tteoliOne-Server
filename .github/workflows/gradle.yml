@@ -115,4 +115,4 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tteolione-nginx
             sudo docker-compose -f /home/ubuntu/github/workspace/docker-compose.yaml down
             sudo docker-compose -f /home/ubuntu/github/workspace/docker-compose.yaml up -d --force-recreate
-            docker image prune -f
+            sudo docker image prune -f
