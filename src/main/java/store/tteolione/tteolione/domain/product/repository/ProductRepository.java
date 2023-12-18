@@ -13,10 +13,8 @@ import java.util.List;
 import static store.tteolione.tteolione.domain.product.constants.ProductConstants.*;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
-    @Query("select p from Product p join p.category where p.category = :category and p.soldStatus = :eProductSoldStatus order by p.updateAt desc")
-    List<Product> findByCategoryAndSoldStatus(@Param("category") Category category, @Param("eProductSoldStatus") EProductSoldStatus eProductSoldStatus);
 
-    @Query("select p from Product p join fetch p.user where p.productId = :productId")
+    @Query("select p from Product p join fetch p.user where p.productId = :productId and p.status='A'")
     Product findByDetailProduct(@Param("productId") Long productId);
 
 }

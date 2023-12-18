@@ -1,6 +1,8 @@
 package store.tteolione.tteolione.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,6 @@ import store.tteolione.tteolione.domain.file.entity.File;
 import store.tteolione.tteolione.domain.file.service.FileService;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.likes.service.LikesService;
-import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
@@ -22,9 +23,11 @@ import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -63,17 +66,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public GetSimpleProductResponse getSimpleProducts(Long userId, double longitude, double latitude) {
-        List<CategorySimpleProductDto> categorySimpleProductDtos = new ArrayList<>();
-        List<Category> allCategory = categoryService.findAll(); //카테고리 id 전부가져오고
-        for (Category category : allCategory) {
-            List<SimpleProductDto> simpleDtoByProductsUserId = productRepository.findSimpleDtoByProductsUserId(userId, category, longitude, latitude);
-            categorySimpleProductDtos.add(new CategorySimpleProductDto(category, simpleDtoByProductsUserId));
-        }
+    public GetSimpleProductResponse getSimpleProducts(double longitude, double latitude) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+
+        List<CategoryProductDto> categoryProductDtos = categoryService.findAll().stream()
+                .map(category -> {
+                    List<ProductDto> productDtos = productRepository.findSimpleDtoByProductsUserId(user, category, longitude, latitude);
+                    return new CategoryProductDto(category, productDtos);
+                })
+                .collect(Collectors.toList());
 
         return GetSimpleProductResponse.builder()
-                .list(categorySimpleProductDtos)
+                .list(categoryProductDtos)
                 .build();
+    }
+
+    @Override
+    public Slice<ProductDto> getListProducts(Long categoryId, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+
+        Category category = categoryService.findByCategoryId(categoryId);
+
+        Slice<ProductDto> listProductDtoByProducts = productRepository.findListProductDtoByProducts(category, user, longitude, latitude, searchStartDate, searchEndDate, pageable);
+
+        return listProductDtoByProducts;
     }
 
     @Override
@@ -83,16 +101,16 @@ public class ProductServiceImpl implements ProductService {
         User user = userService.findByUsername(authentication.getName());
         Optional<Likes> _findLikes = likesService.findByProductAndUser(product, user);
 
-        if (!_findLikes.isPresent()) {
+        if (_findLikes.isEmpty()) {
             //좋아요를 누른적 없다면 likes 생성후, 좋아요 처리
-            product.setLikeCount(product.getLikeCount() + 1);
             Likes likes = Likes.toEntity(user, product);
             likesService.createLikes(likes);
+            product.likeProduct(likes);
             return "좋아요 추가 성공";
         } else {
             //좋아요 누른적 있다면 취소 처리 후 데이터 삭제
             Likes findLikes = _findLikes.get();
-            findLikes.unLikeProduct(product);
+            product.unLikeProduct(findLikes);
             likesService.deleteLikes(findLikes);
             return "좋아요 취소 성공";
         }

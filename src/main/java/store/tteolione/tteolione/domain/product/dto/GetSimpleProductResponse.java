@@ -9,9 +9,9 @@ import java.util.List;
 @Builder
 public class GetSimpleProductResponse {
 
-    private List<CategorySimpleProductDto> list;
+    private List<CategoryProductDto> list;
 
-    public GetSimpleProductResponse(List<CategorySimpleProductDto> list) {
+    public GetSimpleProductResponse(List<CategoryProductDto> list) {
         this.list = list;
     }
 }

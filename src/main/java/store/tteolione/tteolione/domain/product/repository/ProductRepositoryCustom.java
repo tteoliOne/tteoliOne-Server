@@ -1,11 +1,16 @@
 package store.tteolione.tteolione.domain.product.repository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import store.tteolione.tteolione.domain.category.entity.Category;
-import store.tteolione.tteolione.domain.product.dto.SimpleProductDto;
+import store.tteolione.tteolione.domain.product.dto.ProductDto;
+import store.tteolione.tteolione.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ProductRepositoryCustom {
 
-    List<SimpleProductDto> findSimpleDtoByProductsUserId(Long userId, Category category, double longitude, double latitude);
+    List<ProductDto> findSimpleDtoByProductsUserId(User userId, Category category, double longitude, double latitude);
+    Slice<ProductDto> findListProductDtoByProducts(Category category, User user, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
 }

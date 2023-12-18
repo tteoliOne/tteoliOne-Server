@@ -1,6 +1,9 @@
 package store.tteolione.tteolione.domain.product.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,8 +12,8 @@ import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 import store.tteolione.tteolione.global.service.S3Service;
 
-import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -37,10 +40,28 @@ public class ProductController {
      * 상품 간단 조회
      */
     @GetMapping
-    public BaseResponse<GetSimpleProductResponse> simpleProducts(@RequestParam Long userId,
-                                                                 @RequestParam Double longitude,
+    public BaseResponse<GetSimpleProductResponse> simpleProducts(@RequestParam Double longitude,
                                                                  @RequestParam Double latitude) {
-        GetSimpleProductResponse simpleProductResponse = productService.getSimpleProducts(userId, longitude, latitude);
+        GetSimpleProductResponse simpleProductResponse = productService.getSimpleProducts(longitude, latitude);
+        return BaseResponse.of(simpleProductResponse);
+    }
+
+    /**
+     * 상품 목록 조회
+     */
+    @GetMapping("/simple")
+    public BaseResponse<Slice<ProductDto>> getListProducts(@RequestParam Long categoryId,
+                                                          @RequestParam Double longitude,
+                                                          @RequestParam Double latitude,
+                                                          @RequestParam(required = false, defaultValue = "19000101") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchStartDate,
+                                                          @RequestParam(required = false, defaultValue = "99991231") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchEndDate,
+                                                          Pageable pageable
+    ) {
+
+        //기간선택(in)
+        //카테고리
+        //TODO 정렬순서 최신순 과거순
+        Slice<ProductDto> simpleProductResponse = productService.getListProducts(categoryId, longitude, latitude, searchStartDate, searchEndDate, pageable);
         return BaseResponse.of(simpleProductResponse);
     }
 

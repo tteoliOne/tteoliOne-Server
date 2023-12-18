@@ -4,7 +4,7 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
-public class SimpleProductDto {
+public class ProductDto {
     private long productId;
     private String imageUrl;
     private String title;
@@ -12,9 +12,10 @@ public class SimpleProductDto {
     private double walkingDistance;
     private int walkingTime;
     private int totalLikes;
+    private Long likeId;
     private boolean liked;
 
-    public SimpleProductDto(long productId, String imageUrl, String title, int unitPrice, double walkingDistance, int walkingTime, int totalLikes, boolean liked) {
+    public ProductDto(long productId, String imageUrl, String title, int unitPrice, double walkingDistance, int walkingTime, int totalLikes, Long likeId, boolean liked) {
         this.productId = productId;
         this.imageUrl = imageUrl;
         this.title = title;
@@ -22,6 +23,8 @@ public class SimpleProductDto {
         this.walkingDistance = walkingDistance;
         this.walkingTime = walkingTime;
         this.totalLikes = totalLikes;
+        this.likeId = likeId;
         this.liked = liked;
     }
+
 }

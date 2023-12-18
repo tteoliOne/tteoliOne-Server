@@ -3,6 +3,8 @@ package store.tteolione.tteolione.domain.product.entity;
 import lombok.*;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.file.entity.File;
+import store.tteolione.tteolione.domain.likes.constants.LikesConstants;
+import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
@@ -48,6 +50,9 @@ public class Product extends BaseTimeEntity {
     @OneToMany(mappedBy = "product")
     private List<File> images = new ArrayList<>(); //마지막 인덱스가 영수증사진
 
+    @OneToMany(mappedBy = "product")
+    private List<Likes> likes = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -72,6 +77,21 @@ public class Product extends BaseTimeEntity {
     }
 
     //연관관계 메서드
+    public void unLikeProduct(Likes likes) {
+        this.likes.remove(likes);
+        likes.setProduct(null);
+        likes.setLikeStatus(LikesConstants.ELikeStatus.eNOT_LIKED.isLikeStatus());
+        this.setLikeCount(this.likeCount - 1);
+    }
+
+    public void likeProduct(Likes likes) {
+        this.likes.add(likes);
+        likes.setProduct(this);
+        likes.setLikeStatus(LikesConstants.ELikeStatus.eLIKED.isLikeStatus());
+        this.setLikeCount(this.likeCount + 1);
+    }
+
+
     public void addPhotos(List<File> images) {
         for (File image : images) {
             image.setProduct(this);
