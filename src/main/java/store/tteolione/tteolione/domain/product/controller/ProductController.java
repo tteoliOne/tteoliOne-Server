@@ -39,7 +39,7 @@ public class ProductController {
     /**
      * 상품 간단 조회
      */
-    @GetMapping
+    @GetMapping("/simple")
     public BaseResponse<GetSimpleProductResponse> simpleProducts(@RequestParam Double longitude,
                                                                  @RequestParam Double latitude) {
         GetSimpleProductResponse simpleProductResponse = productService.getSimpleProducts(longitude, latitude);
@@ -49,7 +49,7 @@ public class ProductController {
     /**
      * 상품 목록 조회
      */
-    @GetMapping("/simple")
+    @GetMapping()
     public BaseResponse<Slice<ProductDto>> getListProducts(@RequestParam Long categoryId,
                                                           @RequestParam Double longitude,
                                                           @RequestParam Double latitude,
@@ -57,10 +57,6 @@ public class ProductController {
                                                           @RequestParam(required = false, defaultValue = "99991231") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchEndDate,
                                                           Pageable pageable
     ) {
-
-        //기간선택(in)
-        //카테고리
-        //TODO 정렬순서 최신순 과거순
         Slice<ProductDto> simpleProductResponse = productService.getListProducts(categoryId, longitude, latitude, searchStartDate, searchEndDate, pageable);
         return BaseResponse.of(simpleProductResponse);
     }
