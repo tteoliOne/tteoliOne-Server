@@ -1,19 +1,29 @@
 package store.tteolione.tteolione.domain.product.repository;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.file.entity.QFile;
-import store.tteolione.tteolione.domain.product.dto.SimpleProductDto;
+import store.tteolione.tteolione.domain.product.dto.ProductDto;
+import store.tteolione.tteolione.domain.user.entity.User;
+import store.tteolione.tteolione.global.util.QuerydslUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.util.ObjectUtils.isEmpty;
 import static store.tteolione.tteolione.domain.likes.entity.QLikes.*;
 import static store.tteolione.tteolione.domain.product.constants.ProductConstants.*;
 import static store.tteolione.tteolione.domain.product.entity.QProduct.*;
@@ -25,10 +35,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<SimpleProductDto> findSimpleDtoByProductsUserId(Long userId, Category category, double longitude, double latitude) {
-
-        List<SimpleProductDto> result = jpaQueryFactory
-                .select(Projections.constructor(SimpleProductDto.class,
+    public List<ProductDto> findSimpleDtoByProductsUserId(User user, Category category, double longitude, double latitude) {
+        List<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
                         product.productId,
                         ExpressionUtils.as(
                                 JPAExpressions
@@ -48,22 +57,73 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.likeCount.as("totalLikes"),
-                        Expressions.as(
-                                JPAExpressions
-                                        .select(likes.likeStatus)
-                                        .from(likes)
-                                        .where(likes.product.eq(product).and(likes.user.userId.eq(userId)))
-                                , "isLiked"
-                        )
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
                 ))
                 .from(product)
-                .where(categoryEq(category), productStatusEq(EProductSoldStatus.eNew))
-                .orderBy(product.updateAt.desc())
+                .leftJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(categoryEq(category), productStatusEq(EProductSoldStatus.eNew), product.status.eq("A"))
+                .orderBy(product.createAt.desc())
                 .limit(5)
                 .fetch();
         return result;
     }
 
+
+    @Override
+    public Slice<ProductDto> findListProductDtoByProducts(Category category, User user, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
+        List<OrderSpecifier> ORDERS = productSort(pageable);
+        QueryResults<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
+                        product.productId,
+                        ExpressionUtils.as(
+                                JPAExpressions
+                                        .select(QFile.file.fileUrl)
+                                        .from(QFile.file)
+                                        .where(QFile.file.fileId.eq(
+                                                JPAExpressions
+                                                        .select(QFile.file.fileId.min())
+                                                        .from(QFile.file)
+                                                        .where(QFile.file.product.eq(product))
+                                        ))
+                                        .orderBy(QFile.file.updateAt.asc())
+                                , "imageUrl"
+                        ),
+                        product.title,
+                        product.sharePrice.divide(product.shareCount).as("unitPrice"),
+                        calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
+                        calculateWalkingTime(longitude, latitude).as("walkingTime"),
+                        product.likeCount.as("totalLikes"),
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
+                ))
+                .from(product)
+                .leftJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(product.status.eq("A"), categoryEq(category), productStatusEq(EProductSoldStatus.eNew), searchDateBetween(searchStartDate, searchEndDate))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
+                .fetchResults();
+
+        List<ProductDto> content = new ArrayList<>();
+        for (ProductDto eachProduct : result.getResults()) {
+            content.add(eachProduct);
+        }
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    /**
+     * 조건
+     */
     private BooleanExpression productStatusEq(EProductSoldStatus soldStatus) {
         return soldStatus == null ? null : product.soldStatus.eq(soldStatus);
     }
@@ -72,8 +132,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         return category == null ? null : product.category.eq(category);
     }
 
-    private BooleanExpression userIdEq(Long userId) {
-        return userId == null ? null : likes.user.userId.eq(userId);
+    private BooleanExpression searchDateBetween(LocalDate searchStartDate, LocalDate searchEndDate) {
+        return dateGoe(searchStartDate).and(dateLoe(searchEndDate));
+    }
+
+    private BooleanExpression dateGoe(LocalDate searchStartDate) {
+        return product.createAt.goe(LocalDateTime.of(searchStartDate, LocalTime.MIN));
+    }
+
+    private BooleanExpression dateLoe(LocalDate searchEndDate) {
+        return product.createAt.loe(LocalDateTime.of(searchEndDate, LocalTime.MAX).withNano(0));
     }
 
     private static NumberOperation<Double> calculateWalkingDistance(double longitude, double latitude) {
@@ -93,5 +161,39 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         double walkingSpeedMetersPerMinute = walkingSpeedMetersPerSecond * 60; // 분당 도보 속도
         return calculateWalkingDistance(longitude, latitude).divide(walkingSpeedMetersPerMinute).intValue();
     }
+
+    private List<OrderSpecifier> productSort(Pageable pageable) {
+
+        List<OrderSpecifier> ORDERS = new ArrayList<>();
+
+        if (!isEmpty(pageable.getSort())) {
+            for (Sort.Order order : pageable.getSort()) {
+//                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+                switch (order.getProperty()) {
+                    case "createAt-asc":
+                        OrderSpecifier<?> createAtAsc = QuerydslUtil.getSortedColumn(Order.ASC, product, "createAt");
+                        ORDERS.add(createAtAsc);
+                        break;
+                    case "createAt-desc":
+                        OrderSpecifier<?> creaetAtDesc = QuerydslUtil.getSortedColumn(Order.DESC, product, "createAt");
+                        ORDERS.add(creaetAtDesc);
+                        break;
+                    case "updateAt-asc":
+                        OrderSpecifier<?> updateAtAsc = QuerydslUtil.getSortedColumn(Order.ASC, product, "updateAt");
+                        ORDERS.add(updateAtAsc);
+                        break;
+                    case "updateAt-desc":
+                        OrderSpecifier<?> updateAtDesc = QuerydslUtil.getSortedColumn(Order.DESC, product, "updateAt");
+                        ORDERS.add(updateAtDesc);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return ORDERS;
+    }
+
 
 }
