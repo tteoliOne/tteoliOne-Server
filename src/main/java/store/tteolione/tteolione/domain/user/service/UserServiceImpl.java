@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void duplicateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new GeneralException("중복된 닉네임입니다.");
+            throw new GeneralException(Code.MATCH_EXIST_NICKNAME);
         }
     }
 
@@ -240,6 +240,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         findUser.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
 
         return "비밀번호 재설정 성공";
+    }
+
+    @Override
+    public void changeNickname(ChangeNicknameRequest changeNicknameRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByUsername(authentication.getName());
+
+        String newNickname = changeNicknameRequest.getNickname();
+        if (user.getNickname().equals(newNickname)) {
+            throw new GeneralException(Code.EQUALS_NICKNAME);
+        }
+        duplicateNickname(newNickname);
+
+        user.changeNickname(newNickname);
     }
 
 
