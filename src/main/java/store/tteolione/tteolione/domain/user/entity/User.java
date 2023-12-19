@@ -97,4 +97,8 @@ public class User extends BaseTimeEntity {
                 .authorityName(EAuthority.eRoleUser.getValue())
                 .build();
     }
+
+    public void changeNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
 }

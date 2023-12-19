@@ -242,6 +242,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return "비밀번호 재설정 성공";
     }
 
+    @Override
+    public void changeNickname(ChangeNicknameRequest changeNicknameRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByUsername(authentication.getName());
+
+        String newNickname = changeNicknameRequest.getNickname();
+        if (user.getNickname().equals(newNickname)) {
+            throw new GeneralException(Code.EQUALS_NICKNAME);
+        }
+        duplicateNickname(newNickname);
+
+        user.changeNickname(newNickname);
+    }
+
 
     private TokenInfoResponse validateLogin(String loginId, String password) {
         UserDetails userDetails = loadUserByUsername(loginId);

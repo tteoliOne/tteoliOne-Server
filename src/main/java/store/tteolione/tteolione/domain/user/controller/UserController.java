@@ -91,6 +91,15 @@ public class UserController {
         return BaseResponse.of(userService.resetPassword(resetPasswordRequest));
     }
 
+    /**
+     * 닉네임 변경
+     */
+    @PatchMapping("/nickname")
+    public BaseResponse<String> changeNickname(@Valid @RequestBody ChangeNicknameRequest changeNicknameRequest) {
+        userService.changeNickname(changeNicknameRequest);
+        return BaseResponse.of("정상적으로 닉네임이 변경되었습니다.");
+    }
+
 
     /**
      * 토큰 재발행

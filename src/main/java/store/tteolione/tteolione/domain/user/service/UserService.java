@@ -29,4 +29,6 @@ public interface UserService {
     String verifyPassword(VerifyPasswordRequest verifyPasswordRequest);
 
     String resetPassword(ResetPasswordRequest resetPasswordRequest);
+
+    void changeNickname(ChangeNicknameRequest changeNicknameRequest);
 }
