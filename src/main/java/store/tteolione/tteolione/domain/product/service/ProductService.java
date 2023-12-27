@@ -16,6 +16,7 @@ public interface ProductService {
     GetSimpleProductResponse getSimpleProducts(double longitude, double latitude);
 
     Slice<ProductDto> getListProducts(Long categoryId, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
+    Slice<ProductDto> getMyListProducts(double longitude, double latitude, String soldStatus, Pageable pageable);
 
     String likeProduct(Long productId);
 

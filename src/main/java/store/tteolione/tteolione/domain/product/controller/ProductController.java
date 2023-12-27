@@ -96,4 +96,17 @@ public class ProductController {
         productService.deleteProduct(productId);
         return BaseResponse.of("정상적으로 삭제되었습니다.");
     }
+
+    /**
+     * 내 공유글 목록
+     */
+    @GetMapping("/me")
+    public BaseResponse<Slice<ProductDto>> getMyListProducts(@RequestParam Double longitude,
+                                                           @RequestParam Double latitude,
+                                                           @RequestParam(required = false) String status,
+                                                           Pageable pageable
+    ) {
+        Slice<ProductDto> simpleProductResponse = productService.getMyListProducts(longitude, latitude, status, pageable);
+        return BaseResponse.of(simpleProductResponse);
+    }
 }

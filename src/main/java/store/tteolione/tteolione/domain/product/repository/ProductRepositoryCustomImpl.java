@@ -11,8 +11,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.file.entity.QFile;
+import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.ProductDto;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.util.QuerydslUtil;
@@ -63,7 +65,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .from(product)
                 .leftJoin(likes)
                 .on(likes.product.eq(product).and(likes.user.eq(user)))
-                .where(categoryEq(category), productStatusEq(EProductSoldStatus.eNew), product.status.eq("A"))
+                .where(categoryEq(category), productStatusEq("eNew"), product.status.eq("A"))
                 .orderBy(product.createAt.desc())
                 .limit(5)
                 .fetch();
@@ -101,7 +103,57 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .from(product)
                 .leftJoin(likes)
                 .on(likes.product.eq(product).and(likes.user.eq(user)))
-                .where(product.status.eq("A"), categoryEq(category), productStatusEq(EProductSoldStatus.eNew), searchDateBetween(searchStartDate, searchEndDate))
+                .where(product.status.eq("A"), categoryEq(category), productStatusEq("eNew"), searchDateBetween(searchStartDate, searchEndDate))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
+                .fetchResults();
+
+        List<ProductDto> content = new ArrayList<>();
+        for (ProductDto eachProduct : result.getResults()) {
+            content.add(eachProduct);
+        }
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<ProductDto> findMyListProductDtoByProducts(User user, double longitude, double latitude, String soldStatus, Pageable pageable) {
+        List<OrderSpecifier> ORDERS = productSort(pageable);
+        QueryResults<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
+                        product.productId,
+                        ExpressionUtils.as(
+                                JPAExpressions
+                                        .select(QFile.file.fileUrl)
+                                        .from(QFile.file)
+                                        .where(QFile.file.fileId.eq(
+                                                JPAExpressions
+                                                        .select(QFile.file.fileId.min())
+                                                        .from(QFile.file)
+                                                        .where(QFile.file.product.eq(product))
+                                        ))
+                                        .orderBy(QFile.file.updateAt.asc())
+                                , "imageUrl"
+                        ),
+                        product.title,
+                        product.sharePrice.divide(product.shareCount).as("unitPrice"),
+                        calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
+                        calculateWalkingTime(longitude, latitude).as("walkingTime"),
+                        product.likeCount.as("totalLikes"),
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
+                ))
+                .from(product)
+                .leftJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(product.status.eq("A"), product.user.eq(user), productStatusEq(soldStatus))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
@@ -124,8 +176,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     /**
      * 조건
      */
-    private BooleanExpression productStatusEq(EProductSoldStatus soldStatus) {
-        return soldStatus == null ? null : product.soldStatus.eq(soldStatus);
+    private BooleanExpression productStatusEq(String soldStatus) {
+        if (StringUtils.hasText(soldStatus)) {
+            if (soldStatus.equals("eNew") || soldStatus.equals("eSoldOut")) {
+                return product.soldStatus.eq(EProductSoldStatus.valueOf(soldStatus));
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 
     private BooleanExpression categoryEq(Category category) {
@@ -166,7 +225,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
         List<OrderSpecifier> ORDERS = new ArrayList<>();
 
-        if (!isEmpty(pageable.getSort())) {
+        if (!isEmpty(pageable.getSort()) && pageable.getSort().isSorted()) {
             for (Sort.Order order : pageable.getSort()) {
 //                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
                 switch (order.getProperty()) {
@@ -190,10 +249,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         break;
                 }
             }
+        } else {
+            OrderSpecifier<?> creaetAtDesc = QuerydslUtil.getSortedColumn(Order.DESC, product, "createAt");
+            ORDERS.add(creaetAtDesc);
         }
 
         return ORDERS;
     }
+
+
 
 
 }
