@@ -95,6 +95,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Slice<ProductDto> getMyListProducts(double longitude, double latitude, String soldStatus, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+
+        Slice<ProductDto> listProductDtoByProducts = productRepository.findMyListProductDtoByProducts(user, longitude, latitude, soldStatus, pageable);
+
+        return listProductDtoByProducts;
+    }
+
+    @Override
     public String likeProduct(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new GeneralException("존재하지 않은 상품입니다."));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -13,4 +13,5 @@ public interface ProductRepositoryCustom {
 
     List<ProductDto> findSimpleDtoByProductsUserId(User userId, Category category, double longitude, double latitude);
     Slice<ProductDto> findListProductDtoByProducts(Category category, User user, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
+    Slice<ProductDto> findMyListProductDtoByProducts(User user, double longitude, double latitude, String soldStatus, Pageable pageable);
 }
