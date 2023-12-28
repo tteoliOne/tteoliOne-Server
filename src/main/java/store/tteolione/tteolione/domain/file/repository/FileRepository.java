@@ -1,6 +1,7 @@
 package store.tteolione.tteolione.domain.file.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import store.tteolione.tteolione.domain.file.entity.File;
@@ -13,5 +14,8 @@ public interface FileRepository extends JpaRepository<File, Long> {
     @Query("select f from File f join f.product where f.product = :product and f.status='A'")
     List<File> findByProductImages(@Param("product") Product product);
 
+    @Modifying
+    @Query("delete from File f where f.product = :product")
+    void deleteByProduct(@Param("product") Product product);
 }
 

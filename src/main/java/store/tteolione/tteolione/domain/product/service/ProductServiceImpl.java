@@ -24,7 +24,6 @@ import store.tteolione.tteolione.global.exception.GeneralException;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -139,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
     public DetailProductResponse detailProduct(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User buyer = userService.findByUsername(authentication.getName());
-        Product detailProduct = productRepository.findByDetailProduct(productId);
+        Product detailProduct = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         List<String> productImages = detailProduct.productImages();
         String receiptImage = detailProduct.receiptImage();
         Likes likes = likesService.findByProductAndUser(detailProduct, buyer).orElse(null);
@@ -151,10 +150,49 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByUsername(authentication.getName());
-        Product product = productRepository.findByDetailProduct(productId);
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         if (!user.getUserId().equals(product.getUser().getUserId())) {
             throw new GeneralException(Code.MATCH_PRODUCT_USER);
         }
         product.setStatus("DELETE");
+    }
+
+    @Override
+    public PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException  {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(authentication.getName());
+
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+
+        if (!user.getUserId().equals(product.getUser().getUserId())) {
+            throw new GeneralException(Code.MATCH_PRODUCT_USER);
+        }
+
+        //상품과 관련된 사진 제거
+        fileService.deleteByImages(product);
+        product.setImages(null);
+
+        product.updateEntity(postProductRequest);
+
+        Category findCategory = categoryService.findByCategoryId(postProductRequest.getCategoryId());
+
+        //상품 이미지 업로드
+        List<File> uploadPhotos = fileService.saveImages(photos);
+        for (File uploadPhoto : uploadPhotos) {
+            uploadPhoto.setProduct(product);
+        }
+        //영수증 이미지 업로드
+        File uploadReceipt = fileService.saveImage(receipt);
+        uploadReceipt.setProduct(product);
+        uploadPhotos.add(uploadReceipt);
+
+        //카테고리 최신화
+        product.setCategory(findCategory);
+        //이미지 최신화
+        product.setImages(uploadPhotos);
+        product.setUser(user);
+//        productRepository.save(product);
+
+        return PostProductResponse.from(product);
     }
 }
