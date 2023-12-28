@@ -6,6 +6,8 @@ import store.tteolione.tteolione.domain.file.entity.File;
 import store.tteolione.tteolione.domain.likes.constants.LikesConstants;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
+import store.tteolione.tteolione.domain.product.dto.PostProductRequest;
+import store.tteolione.tteolione.domain.product.dto.ProductDto;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
@@ -74,6 +76,18 @@ public class Product extends BaseTimeEntity {
         this.user = user;
         this.category = category;
         this.likeCount = 0;
+    }
+
+    public void updateEntity(PostProductRequest productDto) {
+        this.title = productDto.getTitle();
+        this.buyPrice = productDto.getBuyPrice();
+        this.buyCount = productDto.getBuyCount();
+        this.sharePrice = productDto.getSharePrice();
+        this.shareCount = productDto.getShareCount();
+        this.buyDate = productDto.getBuyDate();
+        this.description = productDto.getDescription();
+        this.longitude = productDto.getLongitude();
+        this.latitude = productDto.getLatitude();
     }
 
     //연관관계 메서드

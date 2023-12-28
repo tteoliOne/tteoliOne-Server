@@ -51,11 +51,11 @@ public class ProductController {
      */
     @GetMapping()
     public BaseResponse<Slice<ProductDto>> getListProducts(@RequestParam Long categoryId,
-                                                          @RequestParam Double longitude,
-                                                          @RequestParam Double latitude,
-                                                          @RequestParam(required = false, defaultValue = "19000101") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchStartDate,
-                                                          @RequestParam(required = false, defaultValue = "99991231") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchEndDate,
-                                                          Pageable pageable
+                                                           @RequestParam Double longitude,
+                                                           @RequestParam Double latitude,
+                                                           @RequestParam(required = false, defaultValue = "19000101") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchStartDate,
+                                                           @RequestParam(required = false, defaultValue = "99991231") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchEndDate,
+                                                           Pageable pageable
     ) {
         Slice<ProductDto> simpleProductResponse = productService.getListProducts(categoryId, longitude, latitude, searchStartDate, searchEndDate, pageable);
         return BaseResponse.of(simpleProductResponse);
@@ -98,15 +98,28 @@ public class ProductController {
     }
 
     /**
+     * 상품 수정
+     */
+    @PutMapping(path = "/{productId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse<PostProductResponse> editProduct(@PathVariable Long productId,
+                                                         @RequestPart(value = "photos") List<MultipartFile> photos,
+                                                         @RequestPart(value = "receipt") MultipartFile receipt,
+                                                         @RequestPart(value = "request") PostProductRequest request) throws IOException {
+        PostProductResponse postProductResponse = productService.editProduct(productId, photos, receipt, request);
+        return BaseResponse.of(postProductResponse);
+    }
+
+    /**
      * 내 공유글 목록
      */
     @GetMapping("/me")
     public BaseResponse<Slice<ProductDto>> getMyListProducts(@RequestParam Double longitude,
-                                                           @RequestParam Double latitude,
-                                                           @RequestParam(required = false) String status,
-                                                           Pageable pageable
+                                                             @RequestParam Double latitude,
+                                                             @RequestParam(required = false) String status,
+                                                             Pageable pageable
     ) {
         Slice<ProductDto> simpleProductResponse = productService.getMyListProducts(longitude, latitude, status, pageable);
         return BaseResponse.of(simpleProductResponse);
     }
+
 }

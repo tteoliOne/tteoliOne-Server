@@ -25,4 +25,6 @@ public interface ProductService {
     DetailProductResponse detailProduct(Long productId);
 
     void deleteProduct(Long productId);
+
+    PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest request) throws IOException ;
 }

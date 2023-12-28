@@ -15,13 +15,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FileServiceImpl implements FileService {
 
     private final S3Service s3Service;
     private final FileRepository fileRepository;
 
     @Override
-    @Transactional
     public List<File> saveImages(List<MultipartFile> multipartFiles) throws IOException {
         List<File> uploadFiles = new ArrayList<>();
 
@@ -41,6 +41,11 @@ public class FileServiceImpl implements FileService {
         File saveImage = fileRepository.save(File.toEntity(uploadUrl));
 
         return saveImage;
+    }
+
+    @Override
+    public void deleteByImages(Product product) {
+        fileRepository.deleteByProduct(product);
     }
 
     @Override
