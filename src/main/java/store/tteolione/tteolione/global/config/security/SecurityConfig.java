@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/users/kakao").permitAll()
+                .antMatchers("/api/users/kakao/profile").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/email/send/signup").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/email/verify/signup").permitAll()
                 .antMatchers(HttpMethod.POST,  "/api/users/signup").permitAll()
