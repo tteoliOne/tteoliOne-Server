@@ -1,12 +1,15 @@
 package store.tteolione.tteolione.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -18,9 +21,10 @@ public class UserController {
     /**
      * 회원가입
      */
-    @PostMapping("/signup")
-    public BaseResponse<String> signupUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        userService.signUpUser(signUpRequest);
+    @PostMapping(path = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse<String> signupUser(@Valid @RequestPart(value = "signUpRequest") SignUpRequest signUpRequest,
+                                           @RequestPart(value = "profile") MultipartFile profile) throws IOException {
+        userService.signUpUser(signUpRequest, profile);
         return BaseResponse.of("회원가입 성공입니다.");
     }
 

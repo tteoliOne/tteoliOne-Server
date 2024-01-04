@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
@@ -21,12 +22,14 @@ import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
+import store.tteolione.tteolione.global.service.S3Service;
 import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import store.tteolione.tteolione.infra.email.service.EmailService;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +46,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthRepository emailAuthRepository;
     private final EmailService emailService;
+    private final S3Service s3Service;
+
 
     @Override
     public UserDetails loadUserByUsername(final String loginId) {
@@ -90,15 +95,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void signUpUser(SignUpRequest signUpRequest) {
+    public void signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException {
         //이미 등록된 회원인지
         validateIsAlreadyRegisteredUser(signUpRequest.getEmail());
-        //이미 이메일이 있는지
-//        validateIsAlreadyRegisteredEmail(signUpRequest.getEmail());
         //보낸 이메일이 인증되었는지 확인
         EmailAuth findEmailAuth = validateEmailAuthEntity(signUpRequest.getEmail());
+        String saveProfile = s3Service.uploadFile(profile);
 
-        userRepository.save(User.toAppEntity(signUpRequest, passwordEncoder, findEmailAuth));
+        userRepository.save(User.toAppEntity(signUpRequest, passwordEncoder, findEmailAuth, saveProfile));
     }
 
     @Override
