@@ -1,15 +1,16 @@
 package store.tteolione.tteolione.domain.user.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 
-import java.util.Optional;
+import java.io.IOException;
 
 public interface UserService {
     User findByUserId(Long userId);
     void validateIsAlreadyRegisteredUser(String email);
     ReissueResponse reissueToken(ReissueRequest reissueRequest);
-    void signUpUser(SignUpRequest signUpRequest);
+    void signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException;
     void validateIsAlreadyRegisteredEmail(String email);
 
     LoginResponse loginUser(LoginRequest loginRequest);

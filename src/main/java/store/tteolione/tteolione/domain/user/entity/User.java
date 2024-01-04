@@ -51,7 +51,7 @@ public class User extends BaseTimeEntity {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
-    public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth) {
+    public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth, String profile) {
         return User.builder()
                 .loginId(signUpRequest.getLoginId())
                 .email(signUpRequest.getEmail())
@@ -59,7 +59,7 @@ public class User extends BaseTimeEntity {
                 .nickname(signUpRequest.getNickname())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .authorities(Collections.singleton(toRoleUserAuthority()))
-                .profile(EBaseUserInfo.eBaseProfile.getValue())
+                .profile(profile)
                 .activated(true)
                 .emailAuthChecked(true)
                 .loginType(ELoginType.eApp)
@@ -71,12 +71,12 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "email_auth_id")
     private EmailAuth emailAuth;
 
-    public static User toKakaoUser(HashMap<String, Object> userInfo) {
+    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile) {
         return User.builder()
                 .loginId(userInfo.get("email").toString())
                 .username(userInfo.get("nickname").toString())
                 .nickname(userInfo.get("nickname").toString())
-                .profile(userInfo.get("profile").toString())
+                .profile(userProfile)
                 .email(userInfo.get("email").toString())
                 .loginType(ELoginType.eKakao)
                 .emailAuthChecked(true)

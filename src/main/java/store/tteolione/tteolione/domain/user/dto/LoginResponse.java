@@ -11,22 +11,27 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class LoginResponse {
 
+    //기존회원일때
+    private boolean existsUser;
     private Long userId;
     private String accessToken;
     private String refreshToken;
     private String nickname;
 
-    public static LoginResponse fromKakao(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo) {
+
+    public static LoginResponse fromKakao(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo, boolean existsUser) {
         return LoginResponse.builder()
-                .userId(Long.valueOf(userInfo.get("userId").toString()))
-                .accessToken(tokenInfoResponse.getAccessToken())
-                .refreshToken(tokenInfoResponse.getRefreshToken())
-                .nickname(userInfo.get("nickname").toString())
+                .existsUser(existsUser)
+                .userId(userInfo == null ? null : Long.valueOf(userInfo.get("userId").toString()))
+                .accessToken(tokenInfoResponse == null ? null : tokenInfoResponse.getAccessToken())
+                .refreshToken(tokenInfoResponse == null ? null : tokenInfoResponse.getRefreshToken())
+                .nickname(userInfo == null ? null : userInfo.get("nickname").toString())
                 .build();
     }
 
     public static LoginResponse fromApp(User user, TokenInfoResponse tokenInfoResponse) {
         return LoginResponse.builder()
+                .existsUser(true)
                 .userId(user.getUserId())
                 .accessToken(tokenInfoResponse.getAccessToken())
                 .refreshToken(tokenInfoResponse.getRefreshToken())
