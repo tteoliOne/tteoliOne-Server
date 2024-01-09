@@ -105,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public String likeProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new GeneralException("존재하지 않은 상품입니다."));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByUsername(authentication.getName());
         Optional<Likes> _findLikes = likesService.findByProductAndUser(product, user);

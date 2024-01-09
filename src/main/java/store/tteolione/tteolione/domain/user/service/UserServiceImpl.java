@@ -69,16 +69,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ReissueResponse reissueToken(ReissueRequest reissueRequest) {
         if (tokenProvider.validateRefreshToken(reissueRequest.getRefreshToken())) {
-            throw new GeneralException("유효하지 않은 Refresh Token입니다.");
+            throw new GeneralException(Code.VALIDATION_REFRESH_TOKEN);
         }
         Authentication authentication = tokenProvider.getAuthentication(reissueRequest.getAccessToken());
         String refreshToken = getRefreshToken(authentication);
 
         if (ObjectUtils.isEmpty(refreshToken)) {
-            throw new GeneralException("잘못된 Refresh Token입니다.");
+            throw new GeneralException(Code.WRONG_REFRESH_TOKEN);
         }
         if (!refreshToken.equals(reissueRequest.getRefreshToken())) {
-            throw new GeneralException("일치하는 Refresh Token이 없습니다.");
+            throw new GeneralException(Code.MATCH_REFRESH_TOKEN);
         }
         TokenInfoResponse tokenInfoResponse = tokenProvider.createToken(authentication);
         this.redisTemplate.opsForValue()
@@ -112,9 +112,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private EmailAuth validateEmailAuthEntity(String email) {
         EmailAuth emailAuth = emailAuthRepository.findTopByEmailOrderByUpdateAtDesc(email)
-                .orElseThrow(() -> new GeneralException("본인인증 버튼을 눌러주세요.")); //이메일 전송도 안되었을때
+                .orElseThrow(() -> new GeneralException(Code.VALIDATION_EMAIL)); //이메일 전송도 안되었을때
         if (!emailAuth.isEmailAuthChecked()) {
-            throw new GeneralException("이메일 인증이 되어있지 않습니다.");
+            throw new GeneralException(Code.VALIDATION_EMAIL);
         }
         return emailAuth;
     }
@@ -126,10 +126,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             User user = findUser.get();
             if (user.isEmailAuthChecked()) {
                 switch (user.getLoginType()) {
-                    case eApp -> throw new GeneralException("이미 회원가입한 회원입니다.");
-                    case eKakao -> throw new GeneralException("이미 카카오로 로그인한 회원입니다.");
-                    case eGoogle -> throw new GeneralException("이미 구글로 로그인한 회원입니다.");
-                    case eNaver -> throw new GeneralException("이미 네이버로 로그인한 회원입니다.");
+                    case eApp -> throw new GeneralException(Code.EXISTS_USER);
+                    case eKakao -> throw new GeneralException(Code.EXISTS_KAKAO);
+                    case eGoogle -> throw new GeneralException(Code.EXISTS_GOOGLE);
+                    case eNaver -> throw new GeneralException(Code.EXISTS_NAVER);
+                    case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
                 }
             }
         }
@@ -150,12 +151,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public LoginResponse loginUser(LoginRequest loginRequest) {
         String loginId = loginRequest.getLoginId();
         User findUser = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new GeneralException("아이디나 비밀번호를 다시 확인해주세요."));
+                .orElseThrow(() -> new GeneralException(Code.MATCH_LOGIN_ID_PW));
         if (!passwordEncoder.matches(loginRequest.getPassword(), findUser.getPassword())) {
-            throw new GeneralException("아이디나 비밀번호를 다시 확인해주세요.");
+            throw new GeneralException(Code.MATCH_LOGIN_ID_PW);
         }
         if (!findUser.isActivated()) {
-            throw new GeneralException("비활성화 유저입니다.");
+            throw new GeneralException(Code.DISABLED_USER);
         }
         TokenInfoResponse tokenInfoResponse = validateLogin(loginId, loginRequest.getPassword());
 
@@ -172,23 +173,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void duplicateLoginId(String loginId) {
         if (userRepository.existsByLoginId(loginId)) {
-            throw new GeneralException("중복된 아이디입니다.");
+            throw new GeneralException(Code.EXISTS_LOGIN_ID);
         }
     }
 
     @Override
     public User findByUsername(String loginId) {
-        return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException("존재하지 않는 회원입니다."));
+        return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.MATCH_USER));
     }
 
     @Override
     public String findLoginId(FindIdRequest findIdRequest) throws Exception {
         User findUser = userRepository.findByUsernameAndEmail(findIdRequest.getUsername(), findIdRequest.getEmail())
-                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
         switch (findUser.getLoginType()) {
-            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
-            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
-            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+            case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+            case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+            case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+            case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
         emailService.sendEmailAuth(findIdRequest.getEmail());
         return "이메일 전송 성공";
@@ -198,21 +200,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public VerifyLoginIdResponse verifyLoginId(VerifyLoginIdRequest verifyLoginIdRequest) {
         boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyLoginIdRequest.getAuthCode(), verifyLoginIdRequest.getEmail()));
         if (!isVerify) {
-            throw new GeneralException("이메일 검증 실패");
+            throw new GeneralException(Code.VERIFY_EMAIL_CODE);
         }
         User findUser = userRepository.findByUsernameAndEmail(verifyLoginIdRequest.getUsername(), verifyLoginIdRequest.getEmail())
-                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
         return new VerifyLoginIdResponse(findUser.getLoginId());
     }
 
     @Override
     public String findPassword(FindPasswordRequest findPasswordRequest) throws Exception {
         User findUser = userRepository.findByUsernameAndEmailAndLoginId(findPasswordRequest.getUsername(), findPasswordRequest.getEmail(), findPasswordRequest.getLoginId())
-                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
         switch (findUser.getLoginType()) {
-            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
-            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
-            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+            case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+            case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+            case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+            case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
         emailService.sendEmailAuth(findPasswordRequest.getEmail());
         return "이메일 전송 성공";
@@ -222,24 +225,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public String verifyPassword(VerifyPasswordRequest verifyPasswordRequest) {
         boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyPasswordRequest.getAuthCode(), verifyPasswordRequest.getEmail()));
         if (!isVerify) {
-            throw new GeneralException("이메일 검증 실패");
+            throw new GeneralException(Code.VERIFY_EMAIL_CODE);
         }
         userRepository.findByUsernameAndEmailAndLoginId(verifyPasswordRequest.getUsername(), verifyPasswordRequest.getEmail(), verifyPasswordRequest.getLoginId())
-                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
         return "비밀번호 이메일 검증 성공";
     }
 
     @Override
     public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
         User findUser = userRepository.findByUsernameAndEmailAndLoginId(resetPasswordRequest.getUsername(), resetPasswordRequest.getEmail(), resetPasswordRequest.getLoginId())
-                .orElseThrow(() -> new GeneralException("회원정보가 일치하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
         switch (findUser.getLoginType()) {
-            case eKakao -> throw new GeneralException("카카오 로그인 회원입니다.");
-            case eGoogle -> throw new GeneralException("구글 로그인 회원입니다.");
-            case eNaver -> throw new GeneralException("네이버 로그인 회원입니다.");
+            case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+            case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+            case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+            case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
         if (passwordEncoder.matches(resetPasswordRequest.getPassword(), findUser.getPassword())) {
-            throw new GeneralException(Code.MATCH_EXIST_PW, "기존 비밀번호와 일치합니다.");
+            throw new GeneralException(Code.MATCH_EXIST_PW);
         }
         findUser.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
 
