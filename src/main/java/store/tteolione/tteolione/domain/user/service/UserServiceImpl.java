@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void duplicateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new GeneralException(Code.MATCH_EXIST_NICKNAME);
+            throw new GeneralException(Code.EXIST_NICKNAME);
         }
     }
 
@@ -178,7 +178,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findByUsername(String loginId) {
+    public User findByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.MATCH_USER));
     }
 
@@ -253,7 +253,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void changeNickname(ChangeNicknameRequest changeNicknameRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = findByUsername(authentication.getName());
+        User user = findByLoginId(authentication.getName());
 
         String newNickname = changeNicknameRequest.getNickname();
         if (user.getNickname().equals(newNickname)) {
@@ -262,6 +262,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         duplicateNickname(newNickname);
 
         user.changeNickname(newNickname);
+    }
+
+    @Override
+    public void editUserInfo(EditUserInfoRequest editUserInfoRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByLoginId(authentication.getName());
+
+        String newNickname = editUserInfoRequest.getNickname();
+        String newIntro = editUserInfoRequest.getIntro();
+
+        //닉네임 자기꺼 빼고 존재하는지
+        if (userRepository.existsByNicknameNotUser(newNickname, user)) {
+            throw new GeneralException(Code.EXIST_NICKNAME);
+        }
+
+        user.changeNickname(newNickname);
+        user.changeIntro(newIntro);
+
     }
 
 

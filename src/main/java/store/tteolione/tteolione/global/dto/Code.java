@@ -49,7 +49,7 @@ public enum Code {
 
     MATCH_PRODUCT_USER(2000, HttpStatus.BAD_REQUEST, "판매자와 일치하지 않습니다."),
     MATCH_EXIST_PW(3000, HttpStatus.BAD_REQUEST, "기존 비밀번호와 일치합니다."),
-    MATCH_EXIST_NICKNAME(3001, HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
+    EXIST_NICKNAME(3001, HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     EQUALS_NICKNAME(4000, HttpStatus.BAD_REQUEST, "기존 닉네임과 일치합니다."),
     NOT_EXISTS_PRODUCT(5000, HttpStatus.BAD_REQUEST, "상품이 존재하지 않습니다."),
 
