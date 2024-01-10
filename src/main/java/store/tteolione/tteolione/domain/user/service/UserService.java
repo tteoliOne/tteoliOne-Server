@@ -34,4 +34,6 @@ public interface UserService {
     void changeNickname(ChangeNicknameRequest changeNicknameRequest);
 
     void editUserInfo(EditUserInfoRequest editUserInfoRequest);
+
+    GetUserInfoResponse getUserInfo();
 }

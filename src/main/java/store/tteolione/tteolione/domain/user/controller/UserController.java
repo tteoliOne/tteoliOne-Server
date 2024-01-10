@@ -104,6 +104,23 @@ public class UserController {
         return BaseResponse.of("정상적으로 닉네임이 변경되었습니다.");
     }
 
+    /**
+     * 내 정보 조회
+     */
+    @GetMapping("")
+    public BaseResponse<GetUserInfoResponse> getUserInfo() {
+        GetUserInfoResponse getUserInfoResponse = userService.getUserInfo();
+        return BaseResponse.of(getUserInfoResponse);
+    }
+
+    /**
+     * 내 정보 수정
+     */
+    @PatchMapping("")
+    public BaseResponse<String> editUserInfo(@Valid @RequestBody EditUserInfoRequest editUserInfoRequest) {
+        userService.editUserInfo(editUserInfoRequest);
+        return BaseResponse.of("내 정보가 정상적으로 수정되었습니다.");
+    }
 
     /**
      * 토큰 재발행
@@ -114,12 +131,4 @@ public class UserController {
         return BaseResponse.of(reissueResponse);
     }
 
-    /**
-     * 내 정보 수정
-     */
-    @PatchMapping("")
-    public BaseResponse<String> test(@Valid @RequestBody EditUserInfoRequest editUserInfoRequest) {
-        userService.editUserInfo(editUserInfoRequest);
-        return BaseResponse.of("내 정보가 정상적으로 수정되었습니다.");
-    }
 }
