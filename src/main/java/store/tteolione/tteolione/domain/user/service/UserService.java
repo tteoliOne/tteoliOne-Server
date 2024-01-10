@@ -19,7 +19,7 @@ public interface UserService {
 
     void duplicateLoginId(String loginId);
 
-    User findByUsername(String loginId);
+    User findByLoginId(String loginId);
 
     String findLoginId(FindIdRequest findIdRequest) throws Exception;
 
@@ -32,4 +32,6 @@ public interface UserService {
     String resetPassword(ResetPasswordRequest resetPasswordRequest);
 
     void changeNickname(ChangeNicknameRequest changeNicknameRequest);
+
+    void editUserInfo(EditUserInfoRequest editUserInfoRequest);
 }

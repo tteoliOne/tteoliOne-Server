@@ -113,4 +113,13 @@ public class UserController {
         ReissueResponse reissueResponse = userService.reissueToken(reissueRequest);
         return BaseResponse.of(reissueResponse);
     }
+
+    /**
+     * 내 정보 수정
+     */
+    @PatchMapping("")
+    public BaseResponse<String> test(@Valid @RequestBody EditUserInfoRequest editUserInfoRequest) {
+        userService.editUserInfo(editUserInfoRequest);
+        return BaseResponse.of("내 정보가 정상적으로 수정되었습니다.");
+    }
 }
