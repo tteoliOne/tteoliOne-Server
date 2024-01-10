@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.category.repository.CategoryRepository;
+import store.tteolione.tteolione.global.dto.Code;
+import store.tteolione.tteolione.global.exception.GeneralException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -16,7 +18,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findByCategoryId(Long categoryId) {
-        return categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("카테고리를 찾을 수 없습니다."));
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new GeneralException(Code.NOT_FOUND_CATEGORY));
     }
 
     @Override

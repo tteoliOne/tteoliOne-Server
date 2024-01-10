@@ -10,8 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
-import store.tteolione.tteolione.global.service.S3Service;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +22,6 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final S3Service s3Service;
 
     /**
      * 상품 등록
@@ -30,7 +29,7 @@ public class ProductController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BaseResponse<PostProductResponse> createProduct(@RequestPart(value = "photos") List<MultipartFile> photos,
                                                            @RequestPart(value = "receipt") MultipartFile receipt,
-                                                           @RequestPart(value = "request") PostProductRequest request) throws IOException {
+                                                           @Valid @RequestPart(value = "request") PostProductRequest request) throws IOException {
 
         PostProductResponse postProductResponse = productService.saveProduct(photos, receipt, request);
         return BaseResponse.of(postProductResponse);

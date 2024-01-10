@@ -5,6 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.user.entity.User;
+import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
@@ -53,11 +54,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public boolean verifyEmailCode(VerifyEmailRequest verifyEmailRequest) {
         EmailAuth emailAuth = emailAuthRepository.findByEmailAndAuthCode(verifyEmailRequest.getEmail(), verifyEmailRequest.getAuthCode())
-                .orElseThrow(() -> new GeneralException("인증코드를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_AUTHCODE));
         LocalDateTime createAt = emailAuth.getCreateAt();
         LocalDateTime currentAt = LocalDateTime.now();
         if (createAt.until(currentAt, ChronoUnit.MINUTES) > 10) {
-            throw new GeneralException("인증코드 유효한 시간인 10분을 초과했습니다.");
+            throw new GeneralException(Code.VALIDATION_AUTHCODE);
         }
         emailAuth.verifyEmail();
         return true;

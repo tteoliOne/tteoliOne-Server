@@ -14,6 +14,7 @@ import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
+import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.dto.OAuth2Attribute;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
@@ -78,7 +79,7 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         //이미 회원가입한 회원인지
         Optional<User> _user = userRepository.findByEmailAndLoginType(userInfo.get("email").toString(), UserConstants.ELoginType.eKakao);
         if (_user.isPresent()) {
-            throw new GeneralException("이미 회원가입한 회원입니다.");
+            throw new GeneralException(Code.EXISTS_USER);
         }
 
         //이미지 업로드
