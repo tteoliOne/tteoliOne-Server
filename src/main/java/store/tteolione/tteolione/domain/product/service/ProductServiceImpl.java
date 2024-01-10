@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = postProductRequest.toEntity();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User findUser = userService.findByUsername(authentication.getName());
+        User findUser = userService.findByLoginId(authentication.getName());
         Category findCategory = categoryService.findByCategoryId(postProductRequest.getCategoryId());
 
 
@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public GetSimpleProductResponse getSimpleProducts(double longitude, double latitude) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
 
         List<CategoryProductDto> categoryProductDtos = categoryService.findAll().stream()
                 .map(category -> {
@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Slice<ProductDto> getListProducts(Long categoryId, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
 
         Category category = categoryService.findByCategoryId(categoryId);
 
@@ -96,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Slice<ProductDto> getMyListProducts(double longitude, double latitude, String soldStatus, Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
 
         Slice<ProductDto> listProductDtoByProducts = productRepository.findMyListProductDtoByProducts(user, longitude, latitude, soldStatus, pageable);
 
@@ -107,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     public String likeProduct(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
         Optional<Likes> _findLikes = likesService.findByProductAndUser(product, user);
 
         if (_findLikes.isEmpty()) {
@@ -128,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PostSaveProductResponse savedList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
         List<Likes> likes = likesService.savedProducts(user);
         PostSaveProductResponse data = PostSaveProductResponse.toData(likes);
         return data;
@@ -137,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public DetailProductResponse detailProduct(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User buyer = userService.findByUsername(authentication.getName());
+        User buyer = userService.findByLoginId(authentication.getName());
         Product detailProduct = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         List<String> productImages = detailProduct.productImages();
         String receiptImage = detailProduct.receiptImage();
@@ -149,7 +149,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         if (!user.getUserId().equals(product.getUser().getUserId())) {
             throw new GeneralException(Code.MATCH_PRODUCT_USER);
@@ -160,7 +160,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException  {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.findByLoginId(authentication.getName());
 
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
 
