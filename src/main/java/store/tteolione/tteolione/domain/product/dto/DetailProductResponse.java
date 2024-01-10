@@ -20,6 +20,7 @@ import static store.tteolione.tteolione.domain.product.constants.ProductConstant
 public class DetailProductResponse {
 
     private Long productId; //상품id
+    private Long categoryId;
     private List<String> images; //상품사진
     private String sellerProfile; //판매자 프로필
     private String receipt;//영수증사진
@@ -43,6 +44,7 @@ public class DetailProductResponse {
     public static DetailProductResponse toData(Product product, User buyer, List<String> productImages, String receiptImage, Likes likes) {
         return builder()
                 .productId(product.getProductId())
+                .categoryId(product.getCategory().getCategoryId())
                 .images(productImages)
                 .sellerProfile(product.getUser().getProfile())
                 .receipt(receiptImage)
