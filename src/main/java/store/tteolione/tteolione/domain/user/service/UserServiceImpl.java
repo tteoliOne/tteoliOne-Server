@@ -282,6 +282,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
+    @Override
+    public GetUserInfoResponse getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByLoginId(authentication.getName());
+        return GetUserInfoResponse.toData(user);
+    }
+
 
     private TokenInfoResponse validateLogin(String loginId, String password) {
         UserDetails userDetails = loadUserByUsername(loginId);
