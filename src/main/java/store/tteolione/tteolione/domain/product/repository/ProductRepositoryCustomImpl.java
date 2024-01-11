@@ -59,6 +59,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
                         likes.likeId,
                         likes.likeStatus.as("liked")
                 ))
@@ -97,6 +98,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
                         likes.likeId,
                         likes.likeStatus.as("liked")
                 ))
