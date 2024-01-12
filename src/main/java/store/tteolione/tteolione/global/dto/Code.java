@@ -44,6 +44,7 @@ public enum Code {
     FOUND_NAVER_USER(121, HttpStatus.BAD_REQUEST, "네이버 로그인 회원입니다."),
     FOUND_GOOGLE_USER(122, HttpStatus.BAD_REQUEST, "구글 로그인 회원입니다."),
     VERIFY_EMAIL_CODE(123, HttpStatus.BAD_REQUEST, "이메일 검증 실패"),
+    EMPTY_QUERY(124, HttpStatus.BAD_REQUEST, "검색어를 입력해주세요"),
 
 
 

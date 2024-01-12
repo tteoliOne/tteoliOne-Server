@@ -17,6 +17,7 @@ import store.tteolione.tteolione.domain.likes.service.LikesService;
 import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
+import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.Code;
@@ -194,5 +195,14 @@ public class ProductServiceImpl implements ProductService {
 //        productRepository.save(product);
 
         return PostProductResponse.from(product);
+    }
+
+    @Override
+    public SearchProductResponse searchProductList(User user, String query, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
+        String keyword = query.replaceAll("\\s+", "%");
+        Slice<ProductDto> listProductDtoByProducts = productRepository.searchProductByCondition(user, keyword, longitude, latitude, searchStartDate, searchEndDate, pageable);
+        SearchProductResponse searchProductResponse = new SearchProductResponse(query, listProductDtoByProducts);
+
+        return searchProductResponse;
     }
 }
