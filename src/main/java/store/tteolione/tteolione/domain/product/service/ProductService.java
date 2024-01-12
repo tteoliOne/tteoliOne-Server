@@ -4,6 +4,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.product.dto.*;
+import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
+import store.tteolione.tteolione.domain.user.entity.User;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,4 +29,6 @@ public interface ProductService {
     void deleteProduct(Long productId);
 
     PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest request) throws IOException ;
+
+    SearchProductResponse searchProductList(User user, String query, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
 }

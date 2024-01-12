@@ -1,5 +1,6 @@
 package store.tteolione.tteolione.domain.product.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.*;
@@ -13,9 +14,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import store.tteolione.tteolione.domain.category.entity.Category;
+import store.tteolione.tteolione.domain.category.entity.QCategory;
 import store.tteolione.tteolione.domain.file.entity.QFile;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.ProductDto;
+import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.util.QuerydslUtil;
 
@@ -59,6 +62,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
                         likes.likeId,
                         likes.likeStatus.as("liked")
                 ))
@@ -97,6 +101,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
                         calculateWalkingTime(longitude, latitude).as("walkingTime"),
                         product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
                         likes.likeId,
                         likes.likeStatus.as("liked")
                 ))
@@ -154,6 +159,58 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .leftJoin(likes)
                 .on(likes.product.eq(product).and(likes.user.eq(user)))
                 .where(product.status.eq("A"), product.user.eq(user), productStatusEq(soldStatus))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
+                .fetchResults();
+
+        List<ProductDto> content = new ArrayList<>();
+        for (ProductDto eachProduct : result.getResults()) {
+            content.add(eachProduct);
+        }
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<ProductDto> searchProductByCondition(User user, String keyword, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
+        List<OrderSpecifier> ORDERS = productSort(pageable);
+        QueryResults<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
+                        product.productId,
+                        ExpressionUtils.as(
+                                JPAExpressions
+                                        .select(QFile.file.fileUrl)
+                                        .from(QFile.file)
+                                        .where(QFile.file.fileId.eq(
+                                                JPAExpressions
+                                                        .select(QFile.file.fileId.min())
+                                                        .from(QFile.file)
+                                                        .where(QFile.file.product.eq(product))
+                                        ))
+                                        .orderBy(QFile.file.updateAt.asc())
+                                , "imageUrl"
+                        ),
+                        product.title,
+                        product.sharePrice.divide(product.shareCount).as("unitPrice"),
+                        calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
+                        calculateWalkingTime(longitude, latitude).as("walkingTime"),
+                        product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
+                ))
+                .from(product)
+                .join(product.category, QCategory.category)
+                .leftJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(product.status.eq("A"), productStatusEq("eNew"), searchDateBetween(searchStartDate, searchEndDate), product.title.like("%"+keyword+"%").or(QCategory.category.categoryName.like("%"+keyword+"%")))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
@@ -255,6 +312,18 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
         }
 
         return ORDERS;
+    }
+
+    //Like
+    private BooleanBuilder buildLikeConditions(String[] words) {
+        String keyword = String.join("%", words);
+        System.out.println("keyword = " + keyword);
+        BooleanBuilder likeConditions = new BooleanBuilder();
+        likeConditions.or(product.title.contains(keyword)
+                .or(QCategory.category.categoryName.contains(keyword)));
+
+
+        return likeConditions;
     }
 
 
