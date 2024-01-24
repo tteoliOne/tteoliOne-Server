@@ -16,7 +16,6 @@ public class EditUserInfoRequest {
     @Size(min = 2, max = 6, message = "닉네임은 2글자 이상 6글자 이하이여야 합니다.")
     private String nickname;
 
-    @NotBlank(message = "소개를 입력해주세요")
     private String intro;
 
 }
