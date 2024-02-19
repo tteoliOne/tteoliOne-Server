@@ -51,6 +51,7 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          S3_REGION: ${{ secrets.S3_REGION }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
           MONGO_TEST_URI: ${{ secrets.MONGO_TEST_URI }}
           SHARING_TOPIC: ${{ secrets.SHARING_TOPIC }}
@@ -73,6 +74,7 @@ jobs:
           echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> .env
           echo "S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}" >> .env
           echo "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" >> .env
+          echo "S3_REGION=${{ secrets.S3_REGION }}" >> .env
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
           echo "MONGO_TEST_URI=${{ secrets.MONGO_TEST_URI }}" >> .env
           echo "SHARING_TOPIC=${{ secrets.SHARING_TOPIC }}" >> .env
