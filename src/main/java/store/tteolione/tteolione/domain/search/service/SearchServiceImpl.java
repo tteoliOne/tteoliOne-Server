@@ -32,7 +32,7 @@ public class SearchServiceImpl implements SearchService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
 
-        //null, ""
+        //null, "" 예외처리
         if (!hasText(query)) {
             throw new GeneralException(Code.EMPTY_QUERY);
         }
