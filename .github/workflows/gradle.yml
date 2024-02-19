@@ -127,8 +127,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.KEY }}
           script: |
-#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tteolione-server
-#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/tteolione-nginx
-#            sudo docker-compose -f /home/ubuntu/github/workspace/docker-compose.yaml down
+
+            docker compose -f /home/ubuntu/github/workspace/docker-compose.yaml down
             docker compose -f /home/ubuntu/github/workspace/docker-compose.yaml up -d --force-recreate
-#            sudo docker image prune -f
+            docker image prune -f
