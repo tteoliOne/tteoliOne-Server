@@ -71,13 +71,14 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "email_auth_id")
     private EmailAuth emailAuth;
 
-    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile) {
+    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile, String targetToken) {
         return User.builder()
                 .loginId(userInfo.get("email").toString())
                 .username(userInfo.get("nickname").toString())
                 .nickname(userInfo.get("nickname").toString())
                 .profile(userProfile)
                 .email(userInfo.get("email").toString())
+                .targetToken(targetToken)
                 .loginType(ELoginType.eKakao)
                 .emailAuthChecked(true)
                 .activated(true)

@@ -14,5 +14,5 @@ public class OAuth2KakaoRequest {
     @NotBlank(message = "카카오의 accessToken을 입력해 주세요.")
     private String accessToken;
 
-//    private String targetToken;
+    private String targetToken;
 }

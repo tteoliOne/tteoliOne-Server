@@ -34,6 +34,14 @@ spring:
     host: redis
     port: 6379
 
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      username:
+      password:
+      test:
+        connectionString: ${MONGO_TEST_URI}
+
 jwt:
   header: Authorization
   secret: ${JWT_SECRET}
@@ -75,3 +83,14 @@ cloud:
       auto: false
     stack:
       auto: false
+
+kafka:
+  sharing:
+    topic: ${SHARING_TOPIC}
+    groupId: ${SHARING_GROUP_ID}
+    broker: ${SHARING_BROKER}
+
+  aggregation:
+    topic: ${AGGREGATION_TOPIC}
+    groupId: ${AGGREGATION_GROUP_ID}
+    broker: ${AGGREGATION_BROKER}

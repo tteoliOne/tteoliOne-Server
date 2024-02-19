@@ -32,7 +32,6 @@ public class SearchServiceImpl implements SearchService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
 
-        System.out.println("query = " + query);
         //null, ""
         if (!hasText(query)) {
             throw new GeneralException(Code.EMPTY_QUERY);

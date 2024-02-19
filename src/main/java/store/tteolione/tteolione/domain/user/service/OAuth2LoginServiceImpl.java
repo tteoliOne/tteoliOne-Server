@@ -49,6 +49,9 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
             return LoginResponse.fromKakao(null, null, false);
         } else {
             saveUser = _user.get();
+            if (oAuth2KakaoRequest.getTargetToken() != null) {
+                saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
+            }
         }
         userInfo.put("userId", saveUser.getUserId());
 
@@ -71,7 +74,6 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
     public LoginResponse signUpKakao(MultipartFile profile, OAuth2KakaoRequest oAuth2KakaoRequest) throws IOException {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(UserConstants.EAuthority.eRoleUser.getValue()));
-        System.out.println("oAuth2KakaoRequest = " + oAuth2KakaoRequest.getAccessToken());
         KakaoUserInfoResponse kakaoResponse = kakaoInfoClient.getUserInfo("Bearer " + oAuth2KakaoRequest.getAccessToken());
 
         HashMap<String, Object> userInfo = getUserInfoHashMap(kakaoResponse);
@@ -85,7 +87,7 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         //이미지 업로드
         String userProfile = s3Service.uploadFile(profile);
 
-        User saveUser = User.toKakaoUser(userInfo, userProfile);
+        User saveUser = User.toKakaoUser(userInfo, userProfile, oAuth2KakaoRequest.getTargetToken());
         userRepository.save(saveUser);
 
         userInfo.put("userId", saveUser.getUserId());
