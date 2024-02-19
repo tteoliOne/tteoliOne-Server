@@ -318,7 +318,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     //Like
     private BooleanBuilder buildLikeConditions(String[] words) {
         String keyword = String.join("%", words);
-        System.out.println("keyword = " + keyword);
         BooleanBuilder likeConditions = new BooleanBuilder();
         likeConditions.or(product.title.contains(keyword)
                 .or(QCategory.category.categoryName.contains(keyword)));

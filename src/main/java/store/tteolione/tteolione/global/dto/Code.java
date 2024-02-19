@@ -30,12 +30,12 @@ public enum Code {
     VALIDATION_EMAIL(107, HttpStatus.BAD_REQUEST, "이메일 인증이 되어있지 않습니다."),
     NOT_EXISTS_AUTHCODE(108, HttpStatus.BAD_REQUEST, "인증코드를 찾을 수 없습니다."),
     VALIDATION_AUTHCODE(109, HttpStatus.BAD_REQUEST, "인증코드 유효한 시간인 10분을 초과했습니다."),
-    MATCH_LOGIN_ID_PW(110, HttpStatus.BAD_REQUEST, "아이디나 비밀번호를 다시 확인해주세요."),
+    NOT_EXISTS_LOGIN_ID_PW(110, HttpStatus.BAD_REQUEST, "아이디나 비밀번호를 다시 확인해주세요."),
     DISABLED_USER(111, HttpStatus.BAD_REQUEST, "비활성화 유저입니다."),
     VALIDATION_REFRESH_TOKEN(112, HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),
     WRONG_REFRESH_TOKEN(113, HttpStatus.BAD_REQUEST, "잘못된 Refresh Token입니다."),
-    MATCH_REFRESH_TOKEN(114, HttpStatus.BAD_REQUEST, "일치하는 Refresh Token이 없습니다."),
-    MATCH_USER(115, HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."),
+    NOT_EXISTS_REFRESH_TOKEN(114, HttpStatus.BAD_REQUEST, "일치하는 Refresh Token이 없습니다."),
+    NOT_EXISTS_USER(115, HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."),
     NOT_FOUND_CATEGORY(116, HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
     EXISTS_LOGIN_ID(117, HttpStatus.BAD_REQUEST, "중복된 아이디입니다."),
     NOT_FOUND_USER_INFO(118, HttpStatus.BAD_REQUEST, "회원정보가 일치하지 않습니다."),
@@ -45,6 +45,11 @@ public enum Code {
     FOUND_GOOGLE_USER(122, HttpStatus.BAD_REQUEST, "구글 로그인 회원입니다."),
     VERIFY_EMAIL_CODE(123, HttpStatus.BAD_REQUEST, "이메일 검증 실패"),
     EMPTY_QUERY(124, HttpStatus.BAD_REQUEST, "검색어를 입력해주세요"),
+    VERIFY_ATK(125, HttpStatus.BAD_REQUEST, "검색어를 입력해주세요"),
+    SOLD_OUT_PRODUCT(126, HttpStatus.BAD_REQUEST, "판매된 상품입니다."),
+    NOT_EXISTS_CHAT_ROOM(127, HttpStatus.BAD_REQUEST, "일치하는 채팅방이 없습니다."),
+    RESERVATION_OR_SOLD_OUT(128, HttpStatus.BAD_REQUEST, "예약중이거나 판매 완료된 상품입니다."),
+
 
 
 

@@ -31,4 +31,12 @@ public interface ProductService {
     PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest request) throws IOException ;
 
     SearchProductResponse searchProductList(User user, String query, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
+
+    void requestProduct(Long productId);
+
+    void approveProduct(Long productId, Long receiverId);
+
+    void rejectProduct(Long productId, Long receiverId);
+
+    void reviewProduct(Long productId, PostReviewRequest postReviewRequest);
 }

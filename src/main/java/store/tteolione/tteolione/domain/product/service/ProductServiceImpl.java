@@ -14,9 +14,13 @@ import store.tteolione.tteolione.domain.file.entity.File;
 import store.tteolione.tteolione.domain.file.service.FileService;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.likes.service.LikesService;
+import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
+import store.tteolione.tteolione.domain.notification.service.NotificationService;
+import store.tteolione.tteolione.domain.review.entity.Review;
+import store.tteolione.tteolione.domain.review.service.ReviewService;
 import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
@@ -39,6 +43,8 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryService categoryService;
     private final LikesService likesService;
     private final ProductRepository productRepository;
+    private final NotificationService notificationService;
+    private final ReviewService reviewService;
 
     @Override
     public PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
@@ -204,5 +210,70 @@ public class ProductServiceImpl implements ProductService {
         SearchProductResponse searchProductResponse = new SearchProductResponse(query, listProductDtoByProducts);
 
         return searchProductResponse;
+    }
+
+    @Override
+    public void requestProduct(Long productId) {
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+
+        //상품이 이미 예약중이면 요청 불가
+        if (!product.getSoldStatus().equals(ProductConstants.EProductSoldStatus.eNew)) {
+            throw new GeneralException(Code.RESERVATION_OR_SOLD_OUT);
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+
+        try {
+            notificationService.sendMessageTo(product.getUser().getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 요청을 하였습니다.", "hello", "hi");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //공유를 요청하였으므로 예약중임
+        product.setSoldStatus(ProductConstants.EProductSoldStatus.eReservation);
+    }
+
+    @Override
+    public void approveProduct(Long productId, Long receiverId) {
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+        User receiver = userService.findByUserId(receiverId);
+
+        try {
+            notificationService.sendMessageTo(receiver.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 승인을 하였습니다.", "hello", "hi");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //공유 승인을 하였으므로 공유가 완료되었음
+        product.setSoldStatus(ProductConstants.EProductSoldStatus.eSoldOut);
+    }
+
+    @Override
+    public void rejectProduct(Long productId, Long receiverId) {
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+        User receiver = userService.findByUserId(receiverId);
+
+        try {
+            notificationService.sendMessageTo(receiver.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 거절을 하였습니다.", "hello", "hi");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //공유 거절을 하였으므로 새 상품으로
+        product.setSoldStatus(ProductConstants.EProductSoldStatus.eNew);
+    }
+
+    @Override
+    public void reviewProduct(Long productId, PostReviewRequest postReviewRequest) {
+        Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+
+        Review saveReview = postReviewRequest.toEntity(user, product);
     }
 }

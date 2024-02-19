@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException(Code.WRONG_REFRESH_TOKEN);
         }
         if (!refreshToken.equals(reissueRequest.getRefreshToken())) {
-            throw new GeneralException(Code.MATCH_REFRESH_TOKEN);
+            throw new GeneralException(Code.NOT_EXISTS_REFRESH_TOKEN);
         }
         TokenInfoResponse tokenInfoResponse = tokenProvider.createToken(authentication);
         this.redisTemplate.opsForValue()
@@ -151,13 +151,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public LoginResponse loginUser(LoginRequest loginRequest) {
         String loginId = loginRequest.getLoginId();
         User findUser = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new GeneralException(Code.MATCH_LOGIN_ID_PW));
+                .orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_LOGIN_ID_PW));
         if (!passwordEncoder.matches(loginRequest.getPassword(), findUser.getPassword())) {
-            throw new GeneralException(Code.MATCH_LOGIN_ID_PW);
+            throw new GeneralException(Code.NOT_EXISTS_LOGIN_ID_PW);
         }
         if (!findUser.isActivated()) {
             throw new GeneralException(Code.DISABLED_USER);
         }
+        findUser.setTargetToken(loginRequest.getTargetToken());
         TokenInfoResponse tokenInfoResponse = validateLogin(loginId, loginRequest.getPassword());
 
         return LoginResponse.fromApp(findUser, tokenInfoResponse);
@@ -179,7 +180,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User findByLoginId(String loginId) {
-        return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.MATCH_USER));
+        return userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
     }
 
     @Override
