@@ -127,7 +127,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.KEY }}
           script: |
-
             docker compose -f /home/ubuntu/github/workspace/docker-compose.yaml down
             docker compose -f /home/ubuntu/github/workspace/docker-compose.yaml up -d --force-recreate
             docker image prune -f
