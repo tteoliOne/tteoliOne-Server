@@ -86,7 +86,7 @@ jobs:
       - name: Create TTEOLIONE_FCM_JSON file
         run: echo "$TTEOLIONE_FCM_JSON" > src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
         env:
-          APPLICATION_YML_CONTENT: ${{ secrets.$TTEOLIONE_FCM_JSON }}
+          TTEOLIONE_FCM_JSON: ${{ secrets.TTEOLIONE_FCM_JSON }}
           
 
       ## GitHub Actions에 도커 권한 부여
