@@ -39,7 +39,7 @@ jobs:
 
       - name: Create TTEOLIONE_FCM_JSON file
         run: |
-          touch main/src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+          touch src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
           echo "${{ secrets.TTEOLIONE_FCM_JSON }}" | base64 -d > src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
         env:
           TTEOLIONE_FCM_JSON: ${{ secrets.TTEOLIONE_FCM_JSON }}
