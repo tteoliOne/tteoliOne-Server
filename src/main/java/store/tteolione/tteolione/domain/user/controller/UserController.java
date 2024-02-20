@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import store.tteolione.tteolione.domain.notification.service.NotificationService;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
@@ -18,7 +17,6 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final NotificationService notificationService;
 
     /**
      * 회원가입
@@ -36,8 +34,6 @@ public class UserController {
     @PostMapping("/login")
     public BaseResponse<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) throws IOException {
         LoginResponse loginResponse = userService.loginUser(loginRequest);
-        notificationService.sendMessageTo("cukYZorFSXGyyH2PabRCp8:APA91bE-zoqKEW90YznrO0rBIfuVHyhFI_1PNvhIZkjIZpKnGhwlzocwNHcQa2xZS1VtaOT053TyAvfW26hzhHAvHgZbIiuV-iQRnX5fbitLTuexq6laTzQveqaI1P2NL2YC43rgGwqH", "test", "test" + "test", "hello", "hi");
-
         return BaseResponse.of(loginResponse);
     }
 
