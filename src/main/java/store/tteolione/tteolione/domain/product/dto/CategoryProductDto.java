@@ -9,7 +9,7 @@ import java.util.List;
 public class CategoryProductDto {
     private Long categoryId;
     private String categoryName;
-    private List<ProductDto> products;
+    private List<ProductDto> products; //카테고리별 상품목록
 
     public CategoryProductDto(Category category, List<ProductDto> products) {
         this.categoryId = category.getCategoryId();
