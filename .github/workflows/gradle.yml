@@ -37,6 +37,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+          # create application-aws.properties
+      - name: copy TTEOLIONE_FCM_JSON
+        if: contains(github.ref, 'master')
+        run: |
+          cd ./src/main/resources
+          rm ./tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+         
+          ls -al
+          touch ./tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+         
+          echo "copy TTEOLIONE_FCM_JSON"
+          echo "${{ secrets.TTEOLIONE_FCM_JSON }}" >> ./tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+        shell: bash
+
       - name: Build with Gradle
         run: ./gradlew clean build -x test
         env:
