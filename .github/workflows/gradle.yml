@@ -37,6 +37,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Create TTEOLIONE_FCM_JSON file
+        run: |
+          touch main/src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+          echo "${{ secrets.TTEOLIONE_FCM_JSON }}" | base64 -d > src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+        env:
+          TTEOLIONE_FCM_JSON: ${{ secrets.TTEOLIONE_FCM_JSON }}
+
       - name: Build with Gradle
         run: ./gradlew clean build -x test
         env:
@@ -83,12 +90,7 @@ jobs:
           echo "AGGREGATION_GROUP_ID=${{ secrets.AGGREGATION_GROUP_ID }}" >> .env
           echo "AGGREGATION_BROKER=${{ secrets.AGGREGATION_BROKER }}" >> .env
 
-      - name: Create TTEOLIONE_FCM_JSON file
-        run: |
-          touch main/src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
-          echo "${{ secrets.TTEOLIONE_FCM_JSON }}" | base64 -d > main/src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
-        env:
-          TTEOLIONE_FCM_JSON: ${{ secrets.TTEOLIONE_FCM_JSON }}
+      
 
 
       ## GitHub Actions에 도커 권한 부여
