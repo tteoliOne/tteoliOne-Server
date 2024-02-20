@@ -84,10 +84,10 @@ jobs:
           echo "AGGREGATION_BROKER=${{ secrets.AGGREGATION_BROKER }}" >> .env
 
       - name: Create TTEOLIONE_FCM_JSON file
-        run: echo "$TTEOLIONE_FCM_JSON" > src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+        run: echo "${{ secrets.TTEOLIONE_FCM_JSON }}" | base64 -d > main/src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
         env:
           TTEOLIONE_FCM_JSON: ${{ secrets.TTEOLIONE_FCM_JSON }}
-          
+
 
       ## GitHub Actions에 도커 권한 부여
       - name: Setup Docker Buildx
