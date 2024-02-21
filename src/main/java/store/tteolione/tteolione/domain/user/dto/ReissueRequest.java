@@ -12,4 +12,6 @@ public class ReissueRequest {
 
     @NotEmpty(message = "refreshToken 을 입력해주세요.")
     private String refreshToken;
+
+    private String targetToken;
 }

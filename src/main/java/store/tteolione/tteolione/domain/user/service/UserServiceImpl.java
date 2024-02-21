@@ -72,6 +72,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException(Code.VALIDATION_REFRESH_TOKEN);
         }
         Authentication authentication = tokenProvider.getAuthentication(reissueRequest.getAccessToken());
+
+        //FCM토큰이 null이 아니면 FCM토큰 교체
+        if (reissueRequest.getTargetToken() != null) {
+            String loginId = authentication.getName();
+            User findUser = userRepository.findByLoginId(loginId)
+                    .orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_LOGIN_ID_PW));
+            findUser.setTargetToken(reissueRequest.getTargetToken());
+        }
+
         String refreshToken = getRefreshToken(authentication);
 
         if (ObjectUtils.isEmpty(refreshToken)) {
