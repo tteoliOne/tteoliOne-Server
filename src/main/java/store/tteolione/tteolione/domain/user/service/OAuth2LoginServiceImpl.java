@@ -46,12 +46,10 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         User saveUser;
         Optional<User> _user = userRepository.findByEmailAndLoginType(userInfo.get("email").toString(), UserConstants.ELoginType.eKakao);
         if (!_user.isPresent()) {
-            return LoginResponse.fromKakao(null, null, false);
+            return LoginResponse.fromKakao(null, null, false, null);
         } else {
             saveUser = _user.get();
-            if (oAuth2KakaoRequest.getTargetToken() != null) {
-                saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
-            }
+            saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
         }
         userInfo.put("userId", saveUser.getUserId());
 
@@ -65,9 +63,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         redisTemplate.opsForValue()
                 .set("RT:" + (String) auth.getPrincipal().getAttributes().get("email"),
                         tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        //TODO targetToken 로직
 
-        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true);
+        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true, saveUser);
     }
 
     @Override
@@ -102,9 +99,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         redisTemplate.opsForValue()
                 .set("RT:" + (String) auth.getPrincipal().getAttributes().get("email"),
                         tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        //TODO targetToken 로직
 
-        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true);
+        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true, saveUser);
     }
 
     private HashMap<String, Object> getUserInfoHashMap(KakaoUserInfoResponse kakaoResponse) {
