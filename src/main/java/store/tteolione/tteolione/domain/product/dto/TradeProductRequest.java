@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class TradeProductRequest {
 
-    private Long receiverId;
+    private Long buyerId;
 
 }

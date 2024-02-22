@@ -49,11 +49,15 @@ public enum Code {
     SOLD_OUT_PRODUCT(126, HttpStatus.BAD_REQUEST, "판매된 상품입니다."),
     NOT_EXISTS_CHAT_ROOM(127, HttpStatus.BAD_REQUEST, "일치하는 채팅방이 없습니다."),
     RESERVATION_OR_SOLD_OUT(128, HttpStatus.BAD_REQUEST, "예약중이거나 판매 완료된 상품입니다."),
+    NOT_MATCH_BUYER(129, HttpStatus.BAD_REQUEST, "구매자가 일치하지 않습니다."),
+    NEW_PRODUCT_OR_SOLD_OUT(130, HttpStatus.BAD_REQUEST, "새 상품이거나 판매 완료된 상품입니다."),
+    PRODUCT_SOLD_OUT(131, HttpStatus.BAD_REQUEST, "판매 완료된 상품입니다."),
+    EXISTS_REVIEW(132, HttpStatus.BAD_REQUEST, "이미 존재하는 리뷰입니다."),
 
 
 
 
-    MATCH_PRODUCT_USER(2000, HttpStatus.BAD_REQUEST, "판매자와 일치하지 않습니다."),
+    NOT_MATCH_PRODUCT_USER(2000, HttpStatus.BAD_REQUEST, "판매자와 일치하지 않습니다."),
     MATCH_EXIST_PW(3000, HttpStatus.BAD_REQUEST, "기존 비밀번호와 일치합니다."),
     EXIST_NICKNAME(3001, HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     EQUALS_NICKNAME(4000, HttpStatus.BAD_REQUEST, "기존 닉네임과 일치합니다."),

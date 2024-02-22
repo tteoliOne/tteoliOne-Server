@@ -1,16 +1,19 @@
 package store.tteolione.tteolione.domain.review.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import store.tteolione.tteolione.domain.product.entity.Product;
+import store.tteolione.tteolione.domain.review.entity.Review;
 import store.tteolione.tteolione.domain.review.repository.ReviewRepository;
+import store.tteolione.tteolione.domain.user.entity.User;
+import store.tteolione.tteolione.global.dto.Code;
+import store.tteolione.tteolione.global.exception.GeneralException;
 
-@Service
-@Transactional
-@RequiredArgsConstructor
-public class ReviewService {
 
-    private final ReviewRepository reviewRepository;
+public interface ReviewService {
+
+    void save(User seller, Review review);
+
+    boolean existsByProduct(Product product);
+
 
 
 }

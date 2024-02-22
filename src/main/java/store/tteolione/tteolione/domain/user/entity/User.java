@@ -35,6 +35,7 @@ public class User extends BaseTimeEntity {
     private String intro;
     private String profile;
     private String targetToken;
+    private double ddabongScore;
 
     @Enumerated(EnumType.STRING)
     private ELoginType loginType;

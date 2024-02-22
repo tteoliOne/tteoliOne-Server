@@ -136,7 +136,7 @@ public class ProductController {
     @PutMapping("/{productId}/approve")
     public BaseResponse<String> approveProduct(@PathVariable("productId") Long productId,
                                                @RequestBody TradeProductRequest tradeProductRequest) {
-        productService.approveProduct(productId, tradeProductRequest.getReceiverId());
+        productService.approveProduct(productId, tradeProductRequest.getBuyerId());
         return BaseResponse.of("정상적으로 승인되었습니다.");
     }
 
@@ -146,7 +146,7 @@ public class ProductController {
     @PutMapping("/{productId}/reject")
     public BaseResponse<String> rejectProduct(@PathVariable("productId") Long productId,
                                               @RequestBody TradeProductRequest tradeProductRequest) {
-        productService.rejectProduct(productId, tradeProductRequest.getReceiverId());
+        productService.rejectProduct(productId, tradeProductRequest.getBuyerId());
         return BaseResponse.of("정상적으로 거절되었습니다.");
     }
 
@@ -155,7 +155,7 @@ public class ProductController {
      */
     @PostMapping("/{productId}/review")
     public BaseResponse<String> reviewProduct(@PathVariable("productId") Long productId,
-                                              @RequestBody PostReviewRequest postReviewRequest) {
+                                              @Valid @RequestBody PostReviewRequest postReviewRequest) {
         productService.reviewProduct(productId, postReviewRequest);
         return BaseResponse.of("정상적으로 후기 작성하였습니다.");
     }

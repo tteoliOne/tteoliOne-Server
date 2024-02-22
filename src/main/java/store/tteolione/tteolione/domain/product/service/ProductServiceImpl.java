@@ -17,8 +17,10 @@ import store.tteolione.tteolione.domain.likes.service.LikesService;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.entity.Product;
+import store.tteolione.tteolione.domain.product.entity.ProductTrade;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
 import store.tteolione.tteolione.domain.notification.service.NotificationService;
+import store.tteolione.tteolione.domain.product.repository.ProductTradeRepository;
 import store.tteolione.tteolione.domain.review.entity.Review;
 import store.tteolione.tteolione.domain.review.service.ReviewService;
 import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
@@ -45,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
     private final ReviewService reviewService;
+    private final ProductTradeRepository productTradeRepository;
 
     @Override
     public PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
@@ -159,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
         User user = userService.findByLoginId(authentication.getName());
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         if (!user.getUserId().equals(product.getUser().getUserId())) {
-            throw new GeneralException(Code.MATCH_PRODUCT_USER);
+            throw new GeneralException(Code.NOT_MATCH_PRODUCT_USER);
         }
         product.setStatus("DELETE");
     }
@@ -172,7 +175,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
 
         if (!user.getUserId().equals(product.getUser().getUserId())) {
-            throw new GeneralException(Code.MATCH_PRODUCT_USER);
+            throw new GeneralException(Code.NOT_MATCH_PRODUCT_USER);
         }
 
         //상품과 관련된 사진 제거
@@ -225,6 +228,8 @@ public class ProductServiceImpl implements ProductService {
         User user = userService.findByLoginId(authentication.getName());
 
         try {
+            ProductTrade saveProductTrade = new ProductTrade(product, product.getUser(), user);
+            productTradeRepository.save(saveProductTrade);
             notificationService.sendMessageTo(product.getUser().getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 요청을 하였습니다.", "hello", "hi");
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -235,14 +240,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void approveProduct(Long productId, Long receiverId) {
+    public void approveProduct(Long productId, Long buyerId) {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByLoginId(authentication.getName());
-        User receiver = userService.findByUserId(receiverId);
+        User user = userService.findByLoginId(authentication.getName()); //판매자
+        User buyer = userService.findByUserId(buyerId);  //구매자
+
+        //판매자가 일치하는 사람인지
+        if (!product.getUser().getUserId().equals(user.getUserId())) {
+            throw new GeneralException(Code.NOT_MATCH_PRODUCT_USER);
+        }
+
+        if (!product.getSoldStatus().equals(ProductConstants.EProductSoldStatus.eReservation)) {
+            throw new GeneralException(Code.NEW_PRODUCT_OR_SOLD_OUT);
+        }
+
+
+        //상품 구매요청한 사람이 일치하는 구매자인지
+        boolean isMatchBuyer = productTradeRepository.existsByProductAndBuyer(product, buyer);
+        if (!isMatchBuyer) {
+            throw new GeneralException(Code.NOT_MATCH_BUYER);
+        }
 
         try {
-            notificationService.sendMessageTo(receiver.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 승인을 하였습니다.", "hello", "hi");
+            notificationService.sendMessageTo(buyer.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 승인을 하였습니다.", "hello", "hi");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -252,14 +273,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void rejectProduct(Long productId, Long receiverId) {
+    public void rejectProduct(Long productId, Long buyerId) {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
-        User receiver = userService.findByUserId(receiverId);
+        User buyer = userService.findByUserId(buyerId);
+
+        //판매자가 일치하는 사람인지
+        if (!product.getUser().getUserId().equals(user.getUserId())) {
+            throw new GeneralException(Code.NOT_MATCH_PRODUCT_USER);
+        }
+
+        if (!product.getSoldStatus().equals(ProductConstants.EProductSoldStatus.eReservation)) {
+            throw new GeneralException(Code.NEW_PRODUCT_OR_SOLD_OUT);
+        }
+
+        //상품 구매요청한 사람이 일치하는 구매자인지
+        ProductTrade productTrade = productTradeRepository.findByProductAndBuyer(product, buyer).orElseThrow(() -> new GeneralException(Code.NOT_MATCH_BUYER));
+        productTradeRepository.delete(productTrade); //공유 거절이므로 데이터 삭제
 
         try {
-            notificationService.sendMessageTo(receiver.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 거절을 하였습니다.", "hello", "hi");
+            notificationService.sendMessageTo(buyer.getTargetToken(), product.getTitle(), user.getNickname() + "님이 공유 거절을 하였습니다.", "hello", "hi");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -274,6 +308,22 @@ public class ProductServiceImpl implements ProductService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
 
+        if (reviewService.existsByProduct(product)) {
+            throw new GeneralException(Code.EXISTS_REVIEW);
+        }
+
+        if (!product.getSoldStatus().equals(ProductConstants.EProductSoldStatus.eSoldOut)) {
+            throw new GeneralException(Code.PRODUCT_SOLD_OUT);
+        }
+
+        //상품 구매한 사람이 일치하는 구매자인지
+        boolean isMatchBuyer = productTradeRepository.existsByProductAndBuyer(product, user);
+        if (!isMatchBuyer) {
+            throw new GeneralException(Code.NOT_MATCH_BUYER);
+        }
+
         Review saveReview = postReviewRequest.toEntity(user, product);
+
+        reviewService.save(product.getUser(), saveReview);
     }
 }
