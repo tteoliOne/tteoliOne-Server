@@ -38,6 +38,15 @@ public class UserController {
     }
 
     /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public BaseResponse<String> loginUser() {
+        userService.logout();
+        return BaseResponse.of("정상적으로 로그아웃하였습니다.");
+    }
+
+    /**
      * 닉네임 중복 확인
      */
     @PostMapping("/check/nickname")

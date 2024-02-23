@@ -15,6 +15,8 @@ public interface UserService {
 
     LoginResponse loginUser(LoginRequest loginRequest);
 
+    void logout();
+
     void duplicateNickname(String nickname);
 
     void duplicateLoginId(String loginId);

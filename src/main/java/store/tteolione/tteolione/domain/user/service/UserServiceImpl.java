@@ -178,6 +178,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public void logout() {
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = findByLoginId(loginId);
+        if (redisTemplate.opsForValue().get("RT:" + user.getLoginId()) != null) {
+            redisTemplate.delete("RT:" + user.getLoginId()); //Token 삭제
+        }
+        user.setTargetToken(null); //FCM 토큰 null
+    }
+
+    @Override
     public void duplicateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new GeneralException(Code.EXIST_NICKNAME);
