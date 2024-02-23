@@ -15,14 +15,14 @@ public class GetUserInfoResponse {
     private String profile;
     private String nickname;
     private String intro;
-    private int thumbsUpScore;
+    private double thumbsUpScore;
 
     public static GetUserInfoResponse toData(User user) {
         return GetUserInfoResponse.builder()
                 .profile(user.getProfile())
                 .nickname(user.getNickname())
                 .intro(user.getIntro())
-                .thumbsUpScore(0)
+                .thumbsUpScore(user.getDdabongScore())
                 .build();
     }
 }
