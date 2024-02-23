@@ -36,4 +36,6 @@ public interface UserService {
     void editUserInfo(EditUserInfoRequest editUserInfoRequest);
 
     GetUserInfoResponse getUserInfo();
+
+    SimpleProfileResponse getSimpleProfile(Long userId);
 }

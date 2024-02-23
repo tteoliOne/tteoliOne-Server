@@ -126,7 +126,7 @@ public class ChatService {
 
         Chat findChatRoom = chatRepository.findByChatId(chatRoomNo).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_CHAT_ROOM));
         Long productId = findChatRoom.getProductNo();
-        Product findProduct = productRepository.findByFetchUser(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+        Product findProduct = productRepository.findByUserAndProductId(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         User opponentUser;
         // 자신이 상품을 공유하는 사람이면 -> 채팅을 개설한 사람 닉네임 전송(opponentNickname)
         if (user.getUserId().equals(findProduct.getUser().getUserId())) {

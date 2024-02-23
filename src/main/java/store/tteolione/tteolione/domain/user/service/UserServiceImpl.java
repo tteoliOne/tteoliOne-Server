@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
+import store.tteolione.tteolione.domain.product.constants.ProductConstants;
+import store.tteolione.tteolione.domain.product.repository.ProductRepository;
+import store.tteolione.tteolione.domain.review.repository.ReviewRepository;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
@@ -28,7 +31,6 @@ import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import store.tteolione.tteolione.infra.email.service.EmailService;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +49,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailAuthRepository emailAuthRepository;
     private final EmailService emailService;
     private final S3Service s3Service;
+    private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository;
 
 
     @Override
@@ -116,7 +120,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User findByUserId(Long userId) {
-        return userRepository.findByUserId(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        return userRepository.findByUserId(userId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
     }
 
     private EmailAuth validateEmailAuthEntity(String email) {
@@ -297,6 +301,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
         return GetUserInfoResponse.toData(user);
+    }
+
+    @Override
+    public SimpleProfileResponse getSimpleProfile(Long userId) {
+
+        User findUser = findByUserId(userId);
+
+        int newProductCount = productRepository.countByUserAndSoldStatus(findUser, ProductConstants.EProductSoldStatus.eNew);
+        int soldOutProductCount = productRepository.countByUserAndSoldStatus(findUser, ProductConstants.EProductSoldStatus.eSoldOut);
+        int reviewCount = reviewRepository.countBySeller(findUser);
+
+        SimpleProfileResponse simpleProfileResponse = SimpleProfileResponse.builder()
+                .profile(findUser.getProfile())
+                .nickname(findUser.getNickname())
+                .intro(findUser.getIntro())
+                .newProductCount(newProductCount)
+                .soldOutProductCount(soldOutProductCount)
+                .reviewCount(reviewCount)
+                .build();
+
+
+        return simpleProfileResponse;
     }
 
 

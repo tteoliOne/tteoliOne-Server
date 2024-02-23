@@ -122,6 +122,20 @@ public class ProductController {
     }
 
     /**
+     * 상대방 공유상태별 상품 목록 조회
+     */
+    @GetMapping("/users/{userId}")
+    public BaseResponse<Slice<ProductDto>> getOpponentListProductsStatus(@PathVariable("userId") Long userId,
+                                                                         @RequestParam Double longitude,
+                                                                         @RequestParam Double latitude,
+                                                                         @RequestParam(value = "soldStatus", defaultValue = "eNew") String soldStatus,
+                                                                         Pageable pageable
+    ) {
+        Slice<ProductDto> simpleProductResponse = productService.getOpponentListProducts(longitude, latitude, userId, soldStatus, pageable);
+        return BaseResponse.of(simpleProductResponse);
+    }
+
+    /**
      * 공유 요청
      */
     @PutMapping("/{productId}/request")

@@ -131,4 +131,15 @@ public class UserController {
         return BaseResponse.of(reissueResponse);
     }
 
+    /**
+     * 상대방 프로필 간단조회
+     */
+    @GetMapping("/{userId}/simple")
+    public BaseResponse<SimpleProfileResponse> simpleProfile(@PathVariable("userId") Long userId) {
+
+        SimpleProfileResponse simpleProfileResponse = userService.getSimpleProfile(userId);
+
+        return BaseResponse.of(simpleProfileResponse);
+    }
+
 }
