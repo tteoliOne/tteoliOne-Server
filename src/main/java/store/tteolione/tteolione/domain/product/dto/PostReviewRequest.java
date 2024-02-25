@@ -6,10 +6,7 @@ import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.review.entity.Review;
 import store.tteolione.tteolione.domain.user.entity.User;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 public class PostReviewRequest {

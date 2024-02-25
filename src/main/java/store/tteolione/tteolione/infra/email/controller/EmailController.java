@@ -1,5 +1,6 @@
 package store.tteolione.tteolione.infra.email.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +12,6 @@ import store.tteolione.tteolione.infra.email.dto.SendEmailRequest;
 import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.service.EmailService;
 
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor

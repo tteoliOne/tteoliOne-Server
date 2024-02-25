@@ -8,7 +8,7 @@ import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 
 @RequiredArgsConstructor

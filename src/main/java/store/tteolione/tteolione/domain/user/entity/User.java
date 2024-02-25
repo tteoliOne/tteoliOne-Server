@@ -1,12 +1,12 @@
 package store.tteolione.tteolione.domain.user.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 
-import javax.persistence.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,6 +86,13 @@ public class User extends BaseTimeEntity {
                 .authorities(Collections.singleton(toRoleUserAuthority()))
                 .build();
 
+    }
+
+    public User toRoleWithDrawUserAuthority() {
+        Authority.builder()
+                .authorityName(EAuthority.eWithdrawalUser.getValue())
+                .build();
+        return this;
     }
 
     public static Authority toRoleDisabledUserAuthority() {

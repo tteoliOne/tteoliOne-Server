@@ -1,11 +1,11 @@
 package store.tteolione.tteolione.domain.user.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 @Entity
 @Getter

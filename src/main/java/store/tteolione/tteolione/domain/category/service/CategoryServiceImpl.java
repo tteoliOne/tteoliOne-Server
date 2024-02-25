@@ -7,7 +7,7 @@ import store.tteolione.tteolione.domain.category.repository.CategoryRepository;
 import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service

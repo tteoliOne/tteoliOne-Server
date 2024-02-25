@@ -1,9 +1,9 @@
 package store.tteolione.tteolione.infra.email.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor

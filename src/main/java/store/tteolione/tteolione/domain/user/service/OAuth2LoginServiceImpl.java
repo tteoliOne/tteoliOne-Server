@@ -20,7 +20,7 @@ import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
 import store.tteolione.tteolione.global.service.S3Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;

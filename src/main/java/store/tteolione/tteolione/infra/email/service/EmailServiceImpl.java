@@ -11,10 +11,10 @@ import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;

@@ -4,7 +4,7 @@ package store.tteolione.tteolione.domain.room.dto.chat;
 import lombok.*;
 import store.tteolione.tteolione.domain.room.entity.mongodb.Chatting;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

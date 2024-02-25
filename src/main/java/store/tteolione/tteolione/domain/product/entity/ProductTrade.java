@@ -3,7 +3,7 @@ package store.tteolione.tteolione.domain.product.entity;
 import lombok.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

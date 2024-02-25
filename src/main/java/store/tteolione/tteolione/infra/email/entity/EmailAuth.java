@@ -1,5 +1,6 @@
 package store.tteolione.tteolione.infra.email.entity;
 
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Setter;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
-import javax.persistence.*;
 import java.util.Collections;
 
 @Entity

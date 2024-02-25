@@ -11,7 +11,7 @@ import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;

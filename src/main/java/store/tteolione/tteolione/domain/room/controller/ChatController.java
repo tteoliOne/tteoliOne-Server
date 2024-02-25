@@ -14,7 +14,7 @@ import store.tteolione.tteolione.domain.room.service.ChatRoomService;
 import store.tteolione.tteolione.domain.room.service.ChatService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 

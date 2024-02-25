@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ import java.util.List;
 public class NotificationService {
 
     private final ObjectMapper objectMapper;
-    private static String FIREBASE_CONFIG_PATH = "tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json";
+    @Value("${firebase.sdk.path}")
+    private String FIREBASE_CONFIG_PATH;
 
     @Autowired
     public NotificationService(ObjectMapper objectMapper) {

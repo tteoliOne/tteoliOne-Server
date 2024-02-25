@@ -4,7 +4,7 @@ import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 
 @Getter
 @Builder
