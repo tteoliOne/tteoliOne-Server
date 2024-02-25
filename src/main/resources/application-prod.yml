@@ -94,3 +94,7 @@ kafka:
     topic: ${AGGREGATION_TOPIC}
     groupId: ${AGGREGATION_GROUP_ID}
     broker: ${AGGREGATION_BROKER}
+
+firebase:
+  sdk:
+    path: tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
