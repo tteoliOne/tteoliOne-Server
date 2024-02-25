@@ -42,5 +42,6 @@ out/
 application-dev.yml
 application-secret.yml
 src/main/resources/tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+src/main/generated
 
 config/**
