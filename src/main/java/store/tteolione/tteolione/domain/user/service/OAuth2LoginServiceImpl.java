@@ -20,7 +20,7 @@ import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
 import store.tteolione.tteolione.global.service.S3Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -46,9 +46,10 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         User saveUser;
         Optional<User> _user = userRepository.findByEmailAndLoginType(userInfo.get("email").toString(), UserConstants.ELoginType.eKakao);
         if (!_user.isPresent()) {
-            return LoginResponse.fromKakao(null, null, false);
+            return LoginResponse.fromKakao(null, null, false, null);
         } else {
             saveUser = _user.get();
+            saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
         }
         userInfo.put("userId", saveUser.getUserId());
 
@@ -62,16 +63,14 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         redisTemplate.opsForValue()
                 .set("RT:" + (String) auth.getPrincipal().getAttributes().get("email"),
                         tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        //TODO targetToken 로직
 
-        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true);
+        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true, saveUser);
     }
 
     @Override
     public LoginResponse signUpKakao(MultipartFile profile, OAuth2KakaoRequest oAuth2KakaoRequest) throws IOException {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(UserConstants.EAuthority.eRoleUser.getValue()));
-        System.out.println("oAuth2KakaoRequest = " + oAuth2KakaoRequest.getAccessToken());
         KakaoUserInfoResponse kakaoResponse = kakaoInfoClient.getUserInfo("Bearer " + oAuth2KakaoRequest.getAccessToken());
 
         HashMap<String, Object> userInfo = getUserInfoHashMap(kakaoResponse);
@@ -85,7 +84,7 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         //이미지 업로드
         String userProfile = s3Service.uploadFile(profile);
 
-        User saveUser = User.toKakaoUser(userInfo, userProfile);
+        User saveUser = User.toKakaoUser(userInfo, userProfile, oAuth2KakaoRequest.getTargetToken());
         userRepository.save(saveUser);
 
         userInfo.put("userId", saveUser.getUserId());
@@ -100,9 +99,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         redisTemplate.opsForValue()
                 .set("RT:" + (String) auth.getPrincipal().getAttributes().get("email"),
                         tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        //TODO targetToken 로직
 
-        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true);
+        return LoginResponse.fromKakao(tokenInfoResponse, userInfo, true, saveUser);
     }
 
     private HashMap<String, Object> getUserInfoHashMap(KakaoUserInfoResponse kakaoResponse) {

@@ -1,12 +1,12 @@
 package store.tteolione.tteolione.domain.user.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 
-import javax.persistence.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +35,7 @@ public class User extends BaseTimeEntity {
     private String intro;
     private String profile;
     private String targetToken;
+    private double ddabongScore;
 
     @Enumerated(EnumType.STRING)
     private ELoginType loginType;
@@ -71,19 +72,27 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "email_auth_id")
     private EmailAuth emailAuth;
 
-    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile) {
+    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile, String targetToken) {
         return User.builder()
                 .loginId(userInfo.get("email").toString())
                 .username(userInfo.get("nickname").toString())
                 .nickname(userInfo.get("nickname").toString())
                 .profile(userProfile)
                 .email(userInfo.get("email").toString())
+                .targetToken(targetToken)
                 .loginType(ELoginType.eKakao)
                 .emailAuthChecked(true)
                 .activated(true)
                 .authorities(Collections.singleton(toRoleUserAuthority()))
                 .build();
 
+    }
+
+    public User toRoleWithDrawUserAuthority() {
+        Authority.builder()
+                .authorityName(EAuthority.eWithdrawalUser.getValue())
+                .build();
+        return this;
     }
 
     public static Authority toRoleDisabledUserAuthority() {

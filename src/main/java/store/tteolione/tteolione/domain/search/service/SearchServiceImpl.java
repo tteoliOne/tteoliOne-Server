@@ -32,11 +32,12 @@ public class SearchServiceImpl implements SearchService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
 
-        System.out.println("query = " + query);
-        //null, ""
+        //null, "" 예외처리
         if (!hasText(query)) {
             throw new GeneralException(Code.EMPTY_QUERY);
         }
+
+        //뛰어쓰기 여러개 하나로
         String keyword = query.replaceAll("\\s+", " ").trim();
         SearchProductResponse searchProductResponse = productService.searchProductList(user, keyword, longitude, latitude, searchStartDate, searchEndDate, pageable);
 

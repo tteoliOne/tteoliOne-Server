@@ -19,13 +19,13 @@ public class LoginResponse {
     private String nickname;
 
 
-    public static LoginResponse fromKakao(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo, boolean existsUser) {
+    public static LoginResponse fromKakao(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo, boolean existsUser, User user) {
         return LoginResponse.builder()
                 .existsUser(existsUser)
                 .userId(userInfo == null ? null : Long.valueOf(userInfo.get("userId").toString()))
                 .accessToken(tokenInfoResponse == null ? null : tokenInfoResponse.getAccessToken())
                 .refreshToken(tokenInfoResponse == null ? null : tokenInfoResponse.getRefreshToken())
-                .nickname(userInfo == null ? null : userInfo.get("nickname").toString())
+                .nickname(userInfo == null ? null : user.getNickname())
                 .build();
     }
 

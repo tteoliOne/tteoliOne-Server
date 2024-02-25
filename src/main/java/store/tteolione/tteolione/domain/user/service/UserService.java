@@ -15,6 +15,8 @@ public interface UserService {
 
     LoginResponse loginUser(LoginRequest loginRequest);
 
+    void logout();
+
     void duplicateNickname(String nickname);
 
     void duplicateLoginId(String loginId);
@@ -36,4 +38,6 @@ public interface UserService {
     void editUserInfo(EditUserInfoRequest editUserInfoRequest);
 
     GetUserInfoResponse getUserInfo();
+
+    SimpleProfileResponse getSimpleProfile(Long userId);
 }

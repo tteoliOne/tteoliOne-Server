@@ -5,13 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
-@SpringBootApplication(
-		exclude = {
-				org.springframework.cloud.aws.autoconfigure.context.ContextInstanceDataAutoConfiguration.class,
-				org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration.class,
-				org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration.class
-		}
-)
+@SpringBootApplication
 public class TteolioneApplication {
 
 	public static void main(String[] args) {

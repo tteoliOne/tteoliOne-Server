@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class SearchProductResponse {
-    private String q;
-    private Slice<ProductDto> list;
+    private String q; //검색어
+    private Slice<ProductDto> list; //결과
 
     public SearchProductResponse(String q, Slice<ProductDto> list) {
         this.q = q;

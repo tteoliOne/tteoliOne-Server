@@ -2,7 +2,7 @@ package store.tteolione.tteolione.domain.user.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 @Data
 public class ReissueRequest {
@@ -12,4 +12,6 @@ public class ReissueRequest {
 
     @NotEmpty(message = "refreshToken 을 입력해주세요.")
     private String refreshToken;
+
+    private String targetToken;
 }

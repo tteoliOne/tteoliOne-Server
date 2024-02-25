@@ -180,6 +180,56 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     }
 
     @Override
+    public Slice<ProductDto> findOpponentListProductDtoByProducts(double longitude, double latitude, User user, User opponent, String soldStatus, Pageable pageable) {
+        QueryResults<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
+                        product.productId,
+                        ExpressionUtils.as(
+                                JPAExpressions
+                                        .select(QFile.file.fileUrl)
+                                        .from(QFile.file)
+                                        .where(QFile.file.fileId.eq(
+                                                JPAExpressions
+                                                        .select(QFile.file.fileId.min())
+                                                        .from(QFile.file)
+                                                        .where(QFile.file.product.eq(product))
+                                        ))
+                                        .orderBy(QFile.file.updateAt.asc())
+                                , "imageUrl"
+                        ),
+                        product.title,
+                        product.sharePrice.divide(product.shareCount).as("unitPrice"),
+                        calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
+                        calculateWalkingTime(longitude, latitude).as("walkingTime"),
+                        product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
+                ))
+                .from(product)
+                .leftJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(product.status.eq("A"), product.user.eq(opponent), productStatusEq(soldStatus))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(product.createAt.desc())
+                .fetchResults();
+
+        List<ProductDto> content = new ArrayList<>();
+        for (ProductDto eachProduct : result.getResults()) {
+            content.add(eachProduct);
+        }
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
     public Slice<ProductDto> searchProductByCondition(User user, String keyword, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
         List<OrderSpecifier> ORDERS = productSort(pageable);
         QueryResults<ProductDto> result = jpaQueryFactory
@@ -236,6 +286,9 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
      */
     private BooleanExpression productStatusEq(String soldStatus) {
         if (StringUtils.hasText(soldStatus)) {
+            // 백스페이스 제거
+            soldStatus = soldStatus.replaceAll("\b", "");
+            soldStatus = soldStatus.trim(); // 문자열 양 끝의 공백 제거
             if (soldStatus.equals("eNew") || soldStatus.equals("eSoldOut")) {
                 return product.soldStatus.eq(EProductSoldStatus.valueOf(soldStatus));
             } else {
@@ -318,7 +371,6 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     //Like
     private BooleanBuilder buildLikeConditions(String[] words) {
         String keyword = String.join("%", words);
-        System.out.println("keyword = " + keyword);
         BooleanBuilder likeConditions = new BooleanBuilder();
         likeConditions.or(product.title.contains(keyword)
                 .or(QCategory.category.categoryName.contains(keyword)));

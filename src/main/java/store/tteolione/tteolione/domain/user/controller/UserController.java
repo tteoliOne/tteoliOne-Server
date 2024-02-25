@@ -8,7 +8,7 @@ import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -32,9 +32,18 @@ public class UserController {
      * 로그인
      */
     @PostMapping("/login")
-    public BaseResponse<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public BaseResponse<LoginResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) throws IOException {
         LoginResponse loginResponse = userService.loginUser(loginRequest);
         return BaseResponse.of(loginResponse);
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public BaseResponse<String> loginUser() {
+        userService.logout();
+        return BaseResponse.of("정상적으로 로그아웃하였습니다.");
     }
 
     /**
@@ -129,6 +138,17 @@ public class UserController {
     public BaseResponse<ReissueResponse> reissue(@Valid @RequestBody ReissueRequest reissueRequest) {
         ReissueResponse reissueResponse = userService.reissueToken(reissueRequest);
         return BaseResponse.of(reissueResponse);
+    }
+
+    /**
+     * 상대방 프로필 간단조회
+     */
+    @GetMapping("/{userId}/simple")
+    public BaseResponse<SimpleProfileResponse> simpleProfile(@PathVariable("userId") Long userId) {
+
+        SimpleProfileResponse simpleProfileResponse = userService.getSimpleProfile(userId);
+
+        return BaseResponse.of(simpleProfileResponse);
     }
 
 }

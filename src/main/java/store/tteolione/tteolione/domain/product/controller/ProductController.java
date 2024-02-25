@@ -11,7 +11,7 @@ import store.tteolione.tteolione.domain.product.dto.*;
 import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -121,4 +121,56 @@ public class ProductController {
         return BaseResponse.of(simpleProductResponse);
     }
 
+    /**
+     * 상대방 공유상태별 상품 목록 조회
+     */
+    @GetMapping("/users/{userId}")
+    public BaseResponse<Slice<ProductDto>> getOpponentListProductsStatus(@PathVariable("userId") Long userId,
+                                                                         @RequestParam Double longitude,
+                                                                         @RequestParam Double latitude,
+                                                                         @RequestParam(value = "soldStatus", defaultValue = "eNew") String soldStatus,
+                                                                         Pageable pageable
+    ) {
+        Slice<ProductDto> simpleProductResponse = productService.getOpponentListProducts(longitude, latitude, userId, soldStatus, pageable);
+        return BaseResponse.of(simpleProductResponse);
+    }
+
+    /**
+     * 공유 요청
+     */
+    @PutMapping("/{productId}/request")
+    public BaseResponse<String> requestProduct(@PathVariable("productId") Long productId) {
+        productService.requestProduct(productId);
+        return BaseResponse.of("정상적으로 요청되었습니다.");
+    }
+
+    /**
+     * 공유 승인
+     */
+    @PutMapping("/{productId}/approve")
+    public BaseResponse<String> approveProduct(@PathVariable("productId") Long productId,
+                                               @RequestBody TradeProductRequest tradeProductRequest) {
+        productService.approveProduct(productId, tradeProductRequest.getBuyerId());
+        return BaseResponse.of("정상적으로 승인되었습니다.");
+    }
+
+    /**
+     * 공유 거절
+     */
+    @PutMapping("/{productId}/reject")
+    public BaseResponse<String> rejectProduct(@PathVariable("productId") Long productId,
+                                              @RequestBody TradeProductRequest tradeProductRequest) {
+        productService.rejectProduct(productId, tradeProductRequest.getBuyerId());
+        return BaseResponse.of("정상적으로 거절되었습니다.");
+    }
+
+    /**
+     * 공유 후기
+     */
+    @PostMapping("/{productId}/review")
+    public BaseResponse<String> reviewProduct(@PathVariable("productId") Long productId,
+                                              @Valid @RequestBody PostReviewRequest postReviewRequest) {
+        productService.reviewProduct(productId, postReviewRequest);
+        return BaseResponse.of("정상적으로 후기 작성하였습니다.");
+    }
 }

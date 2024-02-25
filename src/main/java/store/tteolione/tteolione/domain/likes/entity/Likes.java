@@ -6,7 +6,7 @@ import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import static store.tteolione.tteolione.domain.likes.constants.LikesConstants.*;
 

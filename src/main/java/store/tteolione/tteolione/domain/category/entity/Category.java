@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
