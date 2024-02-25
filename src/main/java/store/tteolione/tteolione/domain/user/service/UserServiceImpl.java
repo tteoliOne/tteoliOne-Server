@@ -310,6 +310,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public GetUserInfoResponse getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
+        System.out.println("user.getDdabongScore() = " + user.getDdabongScore());
         return GetUserInfoResponse.toData(user);
     }
 
