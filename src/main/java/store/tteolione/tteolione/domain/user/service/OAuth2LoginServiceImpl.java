@@ -24,6 +24,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -45,10 +46,24 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         HashMap<String, Object> userInfo = getUserInfoHashMap(kakaoResponse);
         User saveUser;
         Optional<User> _user = userRepository.findByEmailAndLoginType(userInfo.get("email").toString(), UserConstants.ELoginType.eKakao);
+
+        //회원가입
         if (!_user.isPresent()) {
             return LoginResponse.fromKakao(null, null, false, null);
         } else {
+            //회원가입된 유저
             saveUser = _user.get();
+
+            //탈퇴 유저 확인(2주동안 유지)
+            List<GrantedAuthority> grantedAuthorities = saveUser.getAuthorities().stream()
+                    .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
+                    .collect(Collectors.toList());
+            for (GrantedAuthority grantedAuthority : grantedAuthorities) {
+                if (grantedAuthority.getAuthority().equals("ROLE_WITHDRAW_USER")) {
+                    throw new GeneralException(Code.WITH_DRAW_USER);
+                }
+            }
+
             saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
         }
         userInfo.put("userId", saveUser.getUserId());
@@ -105,6 +120,8 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
 
     private HashMap<String, Object> getUserInfoHashMap(KakaoUserInfoResponse kakaoResponse) {
         HashMap<String, Object> userInfo = new HashMap<>();
+        userInfo.put("kakaoUserId", kakaoResponse.id());
+        System.out.println("kakaoResponse.id() = " + kakaoResponse.id());
         userInfo.put("nickname", kakaoResponse.properties().nickname());
         userInfo.put("email", kakaoResponse.kakaoAccount().email());
         return userInfo;

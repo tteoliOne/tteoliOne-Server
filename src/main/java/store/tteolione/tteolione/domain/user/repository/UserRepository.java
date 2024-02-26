@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameAndEmail(String username, String email);
     Optional<User> findByUsernameAndEmailAndLoginId(String username, String email, String loginId);
 
-    @Query("select u from User u where u.userId = :userId")
-    List<User> findByFirstUserId(@Param("userId") Long UserId);
+    @Query("select u from User u where u.userId = :userId and u.updateAt <> :updateAt")
+    List<User> findByFirstUserId(@Param("userId") Long UserId, @Param("updateAt")LocalDateTime updateAt);
 }

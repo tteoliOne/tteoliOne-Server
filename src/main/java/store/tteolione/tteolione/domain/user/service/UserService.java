@@ -40,4 +40,6 @@ public interface UserService {
     GetUserInfoResponse getUserInfo();
 
     SimpleProfileResponse getSimpleProfile(Long userId);
+
+    void deleteUser(Long userId);
 }

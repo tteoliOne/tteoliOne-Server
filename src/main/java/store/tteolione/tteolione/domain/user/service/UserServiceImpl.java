@@ -20,6 +20,7 @@ import store.tteolione.tteolione.domain.product.repository.ProductRepository;
 import store.tteolione.tteolione.domain.review.repository.ReviewRepository;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
+import store.tteolione.tteolione.domain.user.entity.Authority;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import store.tteolione.tteolione.global.dto.Code;
@@ -32,6 +33,7 @@ import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import store.tteolione.tteolione.infra.email.service.EmailService;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -171,6 +173,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (!findUser.isActivated()) {
             throw new GeneralException(Code.DISABLED_USER);
         }
+
+        //탈퇴 유저 확인(2주동안 유지)
+        List<GrantedAuthority> grantedAuthorities = findUser.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
+                .collect(Collectors.toList());
+        for (GrantedAuthority grantedAuthority : grantedAuthorities) {
+            if (grantedAuthority.getAuthority().equals("ROLE_WITHDRAW_USER")) {
+                throw new GeneralException(Code.WITH_DRAW_USER);
+            }
+        }
+
         findUser.setTargetToken(loginRequest.getTargetToken());
         TokenInfoResponse tokenInfoResponse = validateLogin(loginId, loginRequest.getPassword());
 
@@ -310,7 +323,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public GetUserInfoResponse getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
-        System.out.println("user.getDdabongScore() = " + user.getDdabongScore());
         return GetUserInfoResponse.toData(user);
     }
 
@@ -334,6 +346,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
         return simpleProfileResponse;
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = findByLoginId(authentication.getName());
+
+        if (!user.getUserId().equals(userId)) {
+            throw new GeneralException(Code.NOT_MATCH_USER);
+        }
+        //Authority 를  eWithdrawalUser 설정
+        user.setAuthorities(Collections.singleton(User.toRoleWithDrawUserAuthority()));
+        user.setActivated(false);
+
+        //TODO 소셜 로그인도 서비스 종료시켜야됨
+        if (user.getLoginType().equals(UserConstants.ELoginType.eKakao)) {
+
+        }
+
     }
 
 

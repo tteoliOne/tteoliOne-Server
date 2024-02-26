@@ -151,4 +151,12 @@ public class UserController {
         return BaseResponse.of(simpleProfileResponse);
     }
 
+    /**
+     * 회원 탈퇴
+     */
+    @DeleteMapping("/{userId}")
+    public BaseResponse<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return BaseResponse.of("정상적으로 탈퇴 처리가 되었습니다.");
+    }
 }
