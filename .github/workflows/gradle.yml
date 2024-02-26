@@ -64,6 +64,7 @@ jobs:
           AGGREGATION_TOPIC: ${{ secrets.AGGREGATION_TOPIC }}
           AGGREGATION_GROUP_ID: ${{ secrets.AGGREGATION_GROUP_ID }}
           AGGREGATION_BROKER: ${{ secrets.AGGREGATION_BROKER }}
+          KAKAO_ADMIN_KEY: ${{ secrets.KAKAO_ADMIN_KEY }}
       - name: Create env file
         run: |
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
@@ -86,6 +87,7 @@ jobs:
           echo "AGGREGATION_TOPIC=${{ secrets.AGGREGATION_TOPIC }}" >> .env
           echo "AGGREGATION_GROUP_ID=${{ secrets.AGGREGATION_GROUP_ID }}" >> .env
           echo "AGGREGATION_BROKER=${{ secrets.AGGREGATION_BROKER }}" >> .env
+          echo "KAKAO_ADMIN_KEY=${{ secrets.KAKAO_ADMIN_KEY }}" >> .env
 
       
 
