@@ -65,6 +65,7 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
             }
 
             saveUser.setTargetToken(oAuth2KakaoRequest.getTargetToken());
+            saveUser.setProviderId(userInfo.get("kakaoUserId").toString());
         }
         userInfo.put("userId", saveUser.getUserId());
 
