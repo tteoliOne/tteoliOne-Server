@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface KakaoInfoClient {
 
     @GetMapping(value = "/v2/user/me", consumes = "application/x-www-form-urlencoded", produces = "application/json")
-    KakaoUserInfoResponse getUserInfo(
+     KakaoUserInfoResponse getUserInfo(
             @RequestHeader(name = "Authorization")
             String Authorization
     );

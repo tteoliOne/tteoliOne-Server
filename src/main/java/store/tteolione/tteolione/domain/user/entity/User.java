@@ -10,6 +10,7 @@ import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import static store.tteolione.tteolione.domain.user.constant.UserConstants.*;
@@ -43,6 +44,7 @@ public class User extends BaseTimeEntity {
     private String email;
     private boolean emailAuthChecked;
     private String provider;
+    private String providerId;
     private boolean activated;
 
     @ManyToMany
@@ -51,6 +53,11 @@ public class User extends BaseTimeEntity {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "email_auth_id")
+    private EmailAuth emailAuth;
+
 
     public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth, String profile) {
         return User.builder()
@@ -63,14 +70,12 @@ public class User extends BaseTimeEntity {
                 .profile(profile)
                 .activated(true)
                 .emailAuthChecked(true)
+                .providerId(null)
                 .loginType(ELoginType.eApp)
                 .emailAuth(emailAuth)
                 .build();
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "email_auth_id")
-    private EmailAuth emailAuth;
 
     public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile, String targetToken) {
         return User.builder()
@@ -81,6 +86,7 @@ public class User extends BaseTimeEntity {
                 .email(userInfo.get("email").toString())
                 .targetToken(targetToken)
                 .loginType(ELoginType.eKakao)
+                .providerId(userInfo.get("kakaoUserId").toString())
                 .emailAuthChecked(true)
                 .activated(true)
                 .authorities(Collections.singleton(toRoleUserAuthority()))
@@ -88,11 +94,10 @@ public class User extends BaseTimeEntity {
 
     }
 
-    public User toRoleWithDrawUserAuthority() {
-        Authority.builder()
+    public static Authority toRoleWithDrawUserAuthority() {
+        return Authority.builder()
                 .authorityName(EAuthority.eWithdrawalUser.getValue())
                 .build();
-        return this;
     }
 
     public static Authority toRoleDisabledUserAuthority() {

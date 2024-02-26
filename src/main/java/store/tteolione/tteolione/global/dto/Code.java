@@ -53,6 +53,8 @@ public enum Code {
     NEW_PRODUCT_OR_SOLD_OUT(130, HttpStatus.BAD_REQUEST, "새 상품이거나 판매 완료된 상품입니다."),
     PRODUCT_SOLD_OUT(131, HttpStatus.BAD_REQUEST, "판매 완료된 상품입니다."),
     EXISTS_REVIEW(132, HttpStatus.BAD_REQUEST, "이미 존재하는 리뷰입니다."),
+    NOT_MATCH_USER(133, HttpStatus.BAD_REQUEST, "일치하지 않는 회원입니다."),
+    WITH_DRAW_USER(134, HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
 
 
 
