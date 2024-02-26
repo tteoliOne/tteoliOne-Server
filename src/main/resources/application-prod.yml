@@ -98,3 +98,6 @@ kafka:
 firebase:
   sdk:
     path: tteolione-firebase-adminsdk-fk0ms-ed40ba5d01.json
+
+kakao:
+  admin: ${KAKAO_ADMIN_KEY}
