@@ -3,15 +3,16 @@ package store.tteolione.tteolione.domain.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import store.tteolione.tteolione.domain.likes.entity.Likes;
+import store.tteolione.tteolione.domain.product.entity.Product;
+import store.tteolione.tteolione.domain.product.entity.ProductTrade;
+import store.tteolione.tteolione.domain.review.entity.Review;
 import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static store.tteolione.tteolione.domain.user.constant.UserConstants.*;
 
@@ -54,9 +55,24 @@ public class User extends BaseTimeEntity {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "email_auth_id")
     private EmailAuth emailAuth;
+
+    @OneToOne(mappedBy = "seller", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private ProductTrade productTradeSeller;
+
+    @OneToOne(mappedBy = "buyer", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private ProductTrade productTradeBuyer;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<Review> reviewList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<Product> productList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<Likes> likesList = new ArrayList<>();
 
 
     public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth, String profile) {
