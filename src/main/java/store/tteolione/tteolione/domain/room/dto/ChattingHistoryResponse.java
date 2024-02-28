@@ -24,6 +24,7 @@ public class ChattingHistoryResponse {
     private Long opponentId; //상대방 Id(신고를 위해서)
     private String opponentNickname; //상대 닉네임
     private String opponentProfile; //상대 프로필
+    private boolean exitOpponent; //상대 채팅방 나감 여부
     private ProductConstants.EProductSoldStatus soldStatus; //상품 상태
     private boolean checkSeller;
     private List<ChatResponse> chatList; // 채팅 기록들

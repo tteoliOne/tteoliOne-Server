@@ -139,7 +139,7 @@ public class ChatService {
         }
 
         //자신이 판매자인지
-        boolean checkSeller = findProduct.getUser().getUserId().equals(user.getUserId());
+        boolean checkSeller = findProduct.getUser().getUserId().equals(user.getUserId()); //판매자가 JWT토큰과 일치할때
 
         return ChattingHistoryResponse.builder()
                 .loginId(user.getLoginId())
@@ -150,6 +150,7 @@ public class ChatService {
                 .opponentId(opponentUser.getUserId())
                 .opponentNickname(opponentUser.getNickname())
                 .opponentProfile(opponentUser.getProfile())
+                .exitOpponent(checkSeller ? findChatRoom.isExitCreateMember() : findChatRoom.isExitJoinMember())
                 .soldStatus(findProduct.getSoldStatus())
                 .checkSeller(checkSeller)
                 .chatList(chattingList)
