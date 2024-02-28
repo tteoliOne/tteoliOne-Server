@@ -67,9 +67,9 @@ public class StompHandler implements ChannelInterceptor {
         //채팅방에 접속중인 회원이 있는지 확인 -> B가 입장하려고 할떄 A가 있다면 채팅 리스트 갱신 필요(읽음 처리 된 것을 모르기 때문)
         boolean isConnected = chatRoomService.isConnected(chatRoomNo);
 
-        if (isConnected) {
-            chatService.inviteMessage(chatRoomNo, loginId);
-        }
+//        if (isConnected) {
+        chatService.inviteMessage(chatRoomNo, loginId);
+//        }
     }
 
     private Long getChatRoomNo(StompHeaderAccessor accessor) {
