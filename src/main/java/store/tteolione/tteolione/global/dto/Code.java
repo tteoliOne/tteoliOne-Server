@@ -55,6 +55,8 @@ public enum Code {
     EXISTS_REVIEW(132, HttpStatus.BAD_REQUEST, "이미 존재하는 리뷰입니다."),
     NOT_MATCH_USER(133, HttpStatus.BAD_REQUEST, "일치하지 않는 회원입니다."),
     WITH_DRAW_USER(134, HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
+    NOT_EXISTS_REPORT_TYPE(135, HttpStatus.BAD_REQUEST, "존재하지 않는 신고 유형입니다."),
+    NOT_EXISTS_REPORT_CATEGORY(136, HttpStatus.BAD_REQUEST, "존재하지 않는 신고 카테고리입니다."),
 
 
 
