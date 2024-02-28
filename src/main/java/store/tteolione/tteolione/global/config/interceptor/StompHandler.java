@@ -58,14 +58,15 @@ public class StompHandler implements ChannelInterceptor {
         //채팅방 번호 가져오기
         Long chatRoomNo = getChatRoomNo(accessor);
 
+        //채팅방에 접속중인 회원이 있는지 확인 -> B가 입장하려고 할떄 A가 있다면 채팅 리스트 갱신 필요(읽음 처리 된 것을 모르기 때문)
+        boolean isConnected = chatRoomService.isConnected(chatRoomNo);
+
         //Redis에 채팅방 입장 내역 저장(입장 처리) -> B가 입장할 때
         chatRoomService.connectChatRoom(chatRoomNo, loginId);
 
         //A가 입장해있고 B가 입장할 때 B가 없을때 A가 작성한 채팅들을 읽음 처리하기위해 몽고DB 수정
         chatService.updateAllRead(chatRoomNo, loginId);
 
-        //채팅방에 접속중인 회원이 있는지 확인 -> B가 입장하려고 할떄 A가 있다면 채팅 리스트 갱신 필요(읽음 처리 된 것을 모르기 때문)
-        boolean isConnected = chatRoomService.isConnected(chatRoomNo);
 
         if (isConnected) {
             chatService.inviteMessage(chatRoomNo, loginId);
