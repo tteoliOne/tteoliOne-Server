@@ -52,6 +52,7 @@ public class StompHandler implements ChannelInterceptor {
                 getLoginId(getAccessToken(accessor));
                 break;
             case DISCONNECT:
+                log.info("채팅방 disconnect = {}", loginId);
                 deleteToChatRoom(accessor, loginId);
                 break;
         }
