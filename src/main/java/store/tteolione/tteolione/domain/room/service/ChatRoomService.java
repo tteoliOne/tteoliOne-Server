@@ -28,6 +28,14 @@ public class ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
+    @Transactional
+    public void disconnectChatRoom(Long chatRoomNo, String loginId) {
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomNoAndLoginId(chatRoomNo, loginId)
+                .orElseThrow(IllegalStateException::new);
+
+        chatRoomRepository.delete(chatRoom);
+    }
+
     public boolean isConnected(Long chatRoomNo) {
         List<ChatRoom> connectedList = chatRoomRepository.findByChatRoomNo(chatRoomNo);
         boolean isConnected = connectedList.size() == 1;

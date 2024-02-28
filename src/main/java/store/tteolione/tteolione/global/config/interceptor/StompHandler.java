@@ -51,6 +51,9 @@ public class StompHandler implements ChannelInterceptor {
             case SEND:
                 getLoginId(getAccessToken(accessor));
                 break;
+            case DISCONNECT:
+                deleteToChatRoom(accessor, loginId);
+                break;
         }
     }
 
@@ -67,9 +70,18 @@ public class StompHandler implements ChannelInterceptor {
         //채팅방에 접속중인 회원이 있는지 확인 -> B가 입장하려고 할떄 A가 있다면 채팅 리스트 갱신 필요(읽음 처리 된 것을 모르기 때문)
         boolean isConnected = chatRoomService.isConnected(chatRoomNo);
 
-//        if (isConnected) {
+        if (isConnected) {
         chatService.inviteMessage(chatRoomNo, loginId);
-//        }
+        }
+    }
+
+
+    private void deleteToChatRoom(StompHeaderAccessor accessor, String loginId) {
+        //채팅방 번호 가져오기
+        Long chatRoomNo = getChatRoomNo(accessor);
+
+        //Redis 삭제거
+        chatRoomService.disconnectChatRoom(chatRoomNo, loginId);
     }
 
     private Long getChatRoomNo(StompHeaderAccessor accessor) {
