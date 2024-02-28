@@ -37,8 +37,14 @@ public class StompHandler implements ChannelInterceptor {
 
         String loginId = getLoginId(getAccessToken(accessor));
 
-        // Disconnect 명령이 아닐 때만 handleMessage 호출
-        handleMessage(accessor.getCommand(), accessor, loginId);
+        // Disconnect 명령일 경우 로그를 찍습니다.
+        if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+            log.info("User Disconnected: {}", loginId);
+            deleteToChatRoom(accessor, loginId);
+        } else {
+            // Disconnect 명령이 아닐 때만 handleMessage 호출
+            handleMessage(accessor.getCommand(), accessor, loginId);
+        }
         return ChannelInterceptor.super.preSend(message, channel);
     }
 
