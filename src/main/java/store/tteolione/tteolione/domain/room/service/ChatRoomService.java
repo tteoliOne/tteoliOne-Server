@@ -2,10 +2,13 @@ package store.tteolione.tteolione.domain.room.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.room.entity.redis.ChatRoom;
 import store.tteolione.tteolione.domain.room.repository.ChatRoomRepository;
+import store.tteolione.tteolione.domain.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
 
     public void connectChatRoom(Long chatRoomNo, String loginId) {
         //채팅방 입장시
@@ -29,7 +33,9 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void disconnectChatRoom(Long chatRoomNo, String loginId) {
+    public void disconnectChatRoom(Long chatRoomNo) {
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomNoAndLoginId(chatRoomNo, loginId)
                 .orElseThrow(IllegalStateException::new);
 

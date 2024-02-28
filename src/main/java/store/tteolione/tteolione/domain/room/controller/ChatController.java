@@ -69,4 +69,13 @@ public class ChatController {
         Message savedMessage = chatService.sendSaveMessageAndNotification(message);
         return BaseResponse.of(savedMessage);
     }
+
+    /**
+     * 메시지 나가기
+     */
+    @PutMapping("/api/chatRoom/{chatRoomId}")
+    public BaseResponse<String> exitChatRoom(@PathVariable Long chatRoomId) {
+        chatRoomService.disconnectChatRoom(chatRoomId);
+        return BaseResponse.of("정상적으로 채팅방을 나갔습니다.");
+    }
 }

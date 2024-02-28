@@ -37,14 +37,8 @@ public class StompHandler implements ChannelInterceptor {
 
         String loginId = getLoginId(getAccessToken(accessor));
 
-        // Disconnect 명령일 경우 로그를 찍습니다.
-        if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
-            log.info("User Disconnected: {}", loginId);
-            deleteToChatRoom(accessor, loginId);
-        } else {
-            // Disconnect 명령이 아닐 때만 handleMessage 호출
-            handleMessage(accessor.getCommand(), accessor, loginId);
-        }
+        // Disconnect 명령이 아닐 때만 handleMessage 호출
+        handleMessage(accessor.getCommand(), accessor, loginId);
         return ChannelInterceptor.super.preSend(message, channel);
     }
 
@@ -56,10 +50,6 @@ public class StompHandler implements ChannelInterceptor {
             case SUBSCRIBE:
             case SEND:
                 getLoginId(getAccessToken(accessor));
-                break;
-            case DISCONNECT:
-                log.info("채팅방 disconnect = {}", loginId);
-                deleteToChatRoom(accessor, loginId);
                 break;
         }
     }
@@ -78,17 +68,8 @@ public class StompHandler implements ChannelInterceptor {
         boolean isConnected = chatRoomService.isConnected(chatRoomNo);
 
         if (isConnected) {
-        chatService.inviteMessage(chatRoomNo, loginId);
+            chatService.inviteMessage(chatRoomNo, loginId);
         }
-    }
-
-
-    private void deleteToChatRoom(StompHeaderAccessor accessor, String loginId) {
-        //채팅방 번호 가져오기
-        Long chatRoomNo = getChatRoomNo(accessor);
-
-        //Redis 삭제거
-        chatRoomService.disconnectChatRoom(chatRoomNo, loginId);
     }
 
     private Long getChatRoomNo(StompHeaderAccessor accessor) {
