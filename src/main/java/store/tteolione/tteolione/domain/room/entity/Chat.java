@@ -28,4 +28,7 @@ public class Chat {
 
     private LocalDateTime regDate;
 
+    private boolean exitCreateMember;
+
+    private boolean exitJoinMember;
 }

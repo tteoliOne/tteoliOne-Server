@@ -70,6 +70,8 @@ public class ChatService {
                 .createMember(findUser.getUserId())
                 .joinMember(findProduct.getUser().getUserId())
                 .regDate(LocalDateTime.now())
+                .exitCreateMember(true)
+                .exitJoinMember(true)
                 .build();
 
         Chat savedChat = chatRepository.save(chat);
@@ -145,6 +147,7 @@ public class ChatService {
                 .title(findProduct.getTitle())
                 .productImage(findProduct.productProfile())
                 .sharePrice(findProduct.getSharePrice())
+                .opponentId(opponentUser.getUserId())
                 .opponentNickname(opponentUser.getNickname())
                 .opponentProfile(opponentUser.getProfile())
                 .soldStatus(findProduct.getSoldStatus())

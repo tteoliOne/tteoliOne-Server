@@ -21,6 +21,7 @@ public class ChattingHistoryResponse {
     private String title;
     private String productImage; //상품이미지
     private int sharePrice; //공유가격
+    private Long opponentId; //상대방 Id(신고를 위해서)
     private String opponentNickname; //상대 닉네임
     private String opponentProfile; //상대 프로필
     private ProductConstants.EProductSoldStatus soldStatus; //상품 상태
