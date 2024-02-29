@@ -3,6 +3,7 @@ package store.tteolione.tteolione.domain.room.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.room.entity.Chat;
 
 import java.util.List;
@@ -14,7 +15,10 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("select c from Chat c where c.createMember = :memberNo or c.joinMember = :memberNo")
     List<Chat> findChattingRoom(@Param("memberNo") Long memberNo);
 
-    Optional<Chat> findByProductNoAndCreateMember(Long productNo, Long createMember);
+    Optional<Chat> findByProductAndCreateMember(Product product, Long createMember);
 
     Optional<Chat> findByChatId(Long chatId);
+
+    @Query("select c from Chat c join fetch c.product p where c.chatId = :chatId")
+    Optional<Chat> findByChatIdAndProduct(@Param("chatId") Long chatId);
 }

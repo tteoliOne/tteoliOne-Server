@@ -6,7 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.entity.ProductTrade;
+import store.tteolione.tteolione.domain.report.entity.Report;
 import store.tteolione.tteolione.domain.review.entity.Review;
+import store.tteolione.tteolione.domain.room.entity.Chat;
 import store.tteolione.tteolione.domain.user.dto.SignUpRequest;
 import store.tteolione.tteolione.global.entity.BaseTimeEntity;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
@@ -73,6 +75,12 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Likes> likesList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reporter", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<Report> reporter = new ArrayList<>();
+
+    @OneToMany(mappedBy = "joinMember", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<Chat> chatList = new ArrayList<>();
 
 
     public static User toAppEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder, EmailAuth emailAuth, String profile) {

@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.room.entity.redis.ChatRoom;
 import store.tteolione.tteolione.domain.room.repository.ChatRoomRepository;
+import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
+import store.tteolione.tteolione.global.dto.Code;
+import store.tteolione.tteolione.global.exception.GeneralException;
 
 import java.util.List;
 
