@@ -58,7 +58,7 @@ public class ChatService {
         User findUser = userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
         Product findProduct = productRepository.findById(createChatRoomDto.getProductNo()).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
 
-        Optional<Chat> _findChat = chatRepository.findByProductNoAndCreateMember(createChatRoomDto.getProductNo(), findUser.getUserId());
+        Optional<Chat> _findChat = chatRepository.findByProductAndCreateMember(findProduct, findUser.getUserId());
         if (_findChat.isPresent()) {
             Chat findChat = _findChat.get();
             return findChat;
@@ -66,7 +66,7 @@ public class ChatService {
 
 
         Chat chat = Chat.builder()
-                .productNo(createChatRoomDto.getProductNo())
+                .product(findProduct)
                 .createMember(findUser.getUserId())
                 .joinMember(findProduct.getUser().getUserId())
                 .regDate(LocalDateTime.now())
@@ -127,7 +127,7 @@ public class ChatService {
         }
 
         Chat findChatRoom = chatRepository.findByChatId(chatRoomNo).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_CHAT_ROOM));
-        Long productId = findChatRoom.getProductNo();
+        Long productId = findChatRoom.getProduct().getProductId();
         Product findProduct = productRepository.findByUserAndProductId(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         User opponentUser;
         // 자신이 상품을 공유하는 사람이면 -> 채팅을 개설한 사람 닉네임 전송(opponentNickname)
@@ -238,4 +238,43 @@ public class ChatService {
     }
 
 
+    public void deleteChatRoom(Long chatRoomId) {
+
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
+
+        //채팅방 레디스 삭제
+        chatRoomService.disconnectChatRoom(chatRoomId);
+
+        //채팅방
+        Chat findChatRoom = chatRepository.findByChatIdAndProduct(chatRoomId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_CHAT_ROOM));
+
+        //자신이 판매자인지
+        boolean checkSeller = findChatRoom.getProduct().getUser().getUserId().equals(user.getUserId()); //판매자가 JWT토큰과 일치할때
+
+        // -- 상대방이 구독이 안되어있을 때, 즉 채팅방을 나가있을때 떠난 것을 알 수가 없어 DB에 저장 -- //
+        //떠나는 사람이 판매자일때
+        if (checkSeller) {
+            findChatRoom.setExitJoinMember();
+        } else {
+            //떠나는 사람이 구매자일때
+            findChatRoom.setExitCreateMember();
+        }
+
+        // -- 상대방이 현재 채팅방에 입장해있을때, 바로 보내게 하기 위함 -- //
+        //message 객체에 보낸시간, 보낸사람 userId, 닉네임 세팅
+        boolean allConnected = chatRoomService.isAllConnected(chatRoomId);
+        if (allConnected) {
+            Message message = Message.builder()
+                    .chatRoomNo(chatRoomId)
+                    .productNo(findChatRoom.getProduct().getProductId())
+                    .contentType("notice")
+                    .build();
+            message.setSendTimeAndSender(LocalDateTime.now(), user.getUserId(), user.getNickname(), user.getLoginId(), 0);
+
+            //메시지 전송
+            sender.send(ConstantUtils.KAFKA_TOPIC, message);
+        }
+
+    }
 }

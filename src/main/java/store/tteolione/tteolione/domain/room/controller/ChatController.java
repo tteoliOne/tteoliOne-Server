@@ -71,11 +71,20 @@ public class ChatController {
     }
 
     /**
-     * 메시지 나가기
+     * 채팅방 나가기
      */
     @PutMapping("/api/chatRoom/{chatRoomId}")
     public BaseResponse<String> exitChatRoom(@PathVariable Long chatRoomId) {
         chatRoomService.disconnectChatRoom(chatRoomId);
         return BaseResponse.of("정상적으로 채팅방을 나갔습니다.");
+    }
+
+    /**
+     * 채팅방 떠나기
+     */
+    @DeleteMapping("/api/chatRoom/{chatRoomId}")
+    public BaseResponse<String> deleteChatRoom(@PathVariable Long chatRoomId) {
+        chatService.deleteChatRoom(chatRoomId);
+        return BaseResponse.of("정상적으로 채팅방을 떠났습니다.");
     }
 }

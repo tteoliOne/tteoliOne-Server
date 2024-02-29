@@ -37,7 +37,7 @@ public class ChatQueryService {
                         QChat.chat.chatId,
                         QChat.chat.createMember,
                         QChat.chat.joinMember,
-                        QChat.chat.productNo,
+                        QChat.chat.product.productId.as("productNo"),
                         QProduct.product.title,
                         QChat.chat.regDate,
                         Projections.constructor(ChatRoomResponse.Participant.class,
@@ -60,7 +60,7 @@ public class ChatQueryService {
                                                 )), "profile"))
                 ))
                 .from(QChat.chat)
-                .join(QProduct.product).on(QProduct.product.productId.eq(QChat.chat.productNo))
+                .join(QProduct.product).on(QProduct.product.productId.eq(QChat.chat.product.productId))
                 .where(QChat.chat.createMember.eq(userId).or(QChat.chat.joinMember.eq(userId)), productNoEq(productNo))
                 .fetch();
 
@@ -68,7 +68,7 @@ public class ChatQueryService {
     }
 
     private BooleanExpression productNoEq(Long productNo) {
-        return Objects.nonNull(productNo) ? QChat.chat.productNo.eq(productNo) : null;
+        return Objects.nonNull(productNo) ? QChat.chat.product.productId.eq(productNo) : null;
     }
 
     public User getReceiverNumber(Long chatRoomNo, Long senderNo) {
