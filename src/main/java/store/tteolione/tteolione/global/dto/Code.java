@@ -57,6 +57,7 @@ public enum Code {
     WITH_DRAW_USER(134, HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
     NOT_EXISTS_REPORT_TYPE(135, HttpStatus.BAD_REQUEST, "존재하지 않는 신고 유형입니다."),
     NOT_EXISTS_REPORT_CATEGORY(136, HttpStatus.BAD_REQUEST, "존재하지 않는 신고 카테고리입니다."),
+    EQUAL_SELLER_BUYER(137, HttpStatus.BAD_REQUEST, "구매자와 판매자가 동일 회원입니다."),
 
 
 

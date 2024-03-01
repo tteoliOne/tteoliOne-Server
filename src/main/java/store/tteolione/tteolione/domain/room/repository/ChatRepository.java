@@ -15,10 +15,8 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("select c from Chat c where c.createMember = :memberNo or c.joinMember = :memberNo")
     List<Chat> findChattingRoom(@Param("memberNo") Long memberNo);
 
-    Optional<Chat> findByProductAndCreateMember(Product product, Long createMember);
+    Optional<Chat> findByProductNoAndCreateMember(Long productNo, Long createMember);
 
     Optional<Chat> findByChatId(Long chatId);
 
-    @Query("select c from Chat c join fetch c.product p where c.chatId = :chatId")
-    Optional<Chat> findByChatIdAndProduct(@Param("chatId") Long chatId);
 }
