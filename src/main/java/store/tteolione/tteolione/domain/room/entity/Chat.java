@@ -22,9 +22,7 @@ public class Chat {
 
     private Long joinMember;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_no")
-    private Product product;
+    private Long productNo;
 
     private LocalDateTime regDate;
 
