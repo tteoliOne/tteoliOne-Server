@@ -14,7 +14,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @RequiredArgsConstructor
 @Configuration
-@EnableRedisRepositories
+//@EnableRedisRepositories
+@EnableRedisRepositories(basePackages = "store.tteolione.tteolione.domain.room.repository.redis")
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
