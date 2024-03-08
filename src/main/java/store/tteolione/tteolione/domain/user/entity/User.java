@@ -61,11 +61,11 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "email_auth_id")
     private EmailAuth emailAuth;
 
-    @OneToOne(mappedBy = "seller", orphanRemoval = true, cascade = CascadeType.PERSIST)
-    private ProductTrade productTradeSeller;
+    @OneToMany(mappedBy = "seller", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<ProductTrade> productTradeSeller;
 
-    @OneToOne(mappedBy = "buyer", orphanRemoval = true, cascade = CascadeType.PERSIST)
-    private ProductTrade productTradeBuyer;
+    @OneToMany(mappedBy = "buyer", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    private List<ProductTrade> productTradeBuyer;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.PERSIST)
     private List<Review> reviewList = new ArrayList<>();
