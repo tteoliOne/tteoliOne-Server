@@ -17,7 +17,7 @@ import store.tteolione.tteolione.domain.room.dto.chat.Message;
 import store.tteolione.tteolione.domain.room.entity.Chat;
 import store.tteolione.tteolione.domain.room.entity.mongodb.Chatting;
 import store.tteolione.tteolione.domain.room.repository.ChatRepository;
-import store.tteolione.tteolione.domain.room.repository.MongoChatRepository;
+import store.tteolione.tteolione.domain.room.repository.mongodb.MongoChatRepository;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import org.springframework.data.mongodb.core.query.Criteria;
