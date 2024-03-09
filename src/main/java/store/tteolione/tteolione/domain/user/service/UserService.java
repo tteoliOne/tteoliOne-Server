@@ -35,7 +35,7 @@ public interface UserService {
 
     void changeNickname(ChangeNicknameRequest changeNicknameRequest);
 
-    void editUserInfo(EditUserInfoRequest editUserInfoRequest);
+    void editUserInfo(EditUserInfoRequest editUserInfoRequest, MultipartFile profile) throws IOException;
 
     GetUserInfoResponse getUserInfo();
 

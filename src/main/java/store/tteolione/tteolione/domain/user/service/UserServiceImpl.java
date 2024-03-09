@@ -21,7 +21,6 @@ import store.tteolione.tteolione.domain.product.repository.ProductRepository;
 import store.tteolione.tteolione.domain.review.repository.ReviewRepository;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
-import store.tteolione.tteolione.domain.user.entity.Authority;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
 import store.tteolione.tteolione.global.dto.Code;
@@ -36,6 +35,7 @@ import store.tteolione.tteolione.infra.email.service.EmailService;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -308,21 +308,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void editUserInfo(EditUserInfoRequest editUserInfoRequest) {
+    public void editUserInfo(EditUserInfoRequest editUserInfoRequest, MultipartFile profile) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
 
         String newNickname = editUserInfoRequest.getNickname();
         String newIntro = editUserInfoRequest.getIntro();
 
-        //닉네임 자기꺼 빼고 존재하는지
+        // 닉네임 자기꺼 빼고 존재하는지
         if (userRepository.existsByNicknameNotUser(newNickname, user)) {
             throw new GeneralException(Code.EXIST_NICKNAME);
         }
 
+        if (profile != null && !profile.isEmpty()) {
+            String newProfile = s3Service.uploadFile(profile);
+            user.changeProfile(newProfile);
+        }
+
         user.changeNickname(newNickname);
         user.changeIntro(newIntro);
-
     }
 
     @Override
@@ -364,6 +368,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         //Authority 를  eWithdrawalUser 설정
         user.setAuthorities(Collections.singleton(User.toRoleWithDrawUserAuthority()));
+        user.setTargetToken(null);
         user.setActivated(false);
 
         //TODO 다른 소셜 로그인도 서비스 종료시켜야됨
