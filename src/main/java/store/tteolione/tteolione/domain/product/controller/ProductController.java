@@ -12,6 +12,7 @@ import store.tteolione.tteolione.domain.product.service.ProductService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
 import jakarta.validation.Valid;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -118,6 +119,18 @@ public class ProductController {
                                                              Pageable pageable
     ) {
         Slice<ProductDto> simpleProductResponse = productService.getMyListProducts(longitude, latitude, status, pageable);
+        return BaseResponse.of(simpleProductResponse);
+    }
+
+    /**
+     * 내 저장글 목록
+     */
+    @GetMapping("/me/saved")
+    public BaseResponse<Slice<ProductDto>> getMySaveListProducts(@RequestParam Double longitude,
+                                                                 @RequestParam Double latitude,
+                                                                 Pageable pageable
+    ) {
+        Slice<ProductDto> simpleProductResponse = productService.getMySaveListProducts(longitude, latitude, pageable);
         return BaseResponse.of(simpleProductResponse);
     }
 

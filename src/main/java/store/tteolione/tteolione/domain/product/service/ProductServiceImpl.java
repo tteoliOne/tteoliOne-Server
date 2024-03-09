@@ -114,6 +114,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Slice<ProductDto> getMySaveListProducts(double longitude, double latitude, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+
+        Slice<ProductDto> listProductDtoByProducts = productRepository.findMySaveListProductDtoByProducts(user, longitude, latitude, pageable);
+
+        return listProductDtoByProducts;
+    }
+
+    @Override
     public Slice<ProductDto> getOpponentListProducts(double longitude, double latitude, Long opponentId, String soldStatus, Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());

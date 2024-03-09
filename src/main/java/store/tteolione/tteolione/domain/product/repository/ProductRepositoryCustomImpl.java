@@ -11,11 +11,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import store.tteolione.tteolione.domain.category.entity.Category;
 import store.tteolione.tteolione.domain.category.entity.QCategory;
 import store.tteolione.tteolione.domain.file.entity.QFile;
+import store.tteolione.tteolione.domain.likes.entity.Likes;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.ProductDto;
 import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
@@ -160,6 +163,59 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .leftJoin(likes)
                 .on(likes.product.eq(product).and(likes.user.eq(user)))
                 .where(product.status.eq("A"), product.user.eq(user), productStatusEq(soldStatus))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
+                .fetchResults();
+
+        List<ProductDto> content = new ArrayList<>();
+        for (ProductDto eachProduct : result.getResults()) {
+            content.add(eachProduct);
+        }
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<ProductDto> findMySaveListProductDtoByProducts(User user, double longitude, double latitude, Pageable pageable) {
+//        @Query("select distinct l from Likes l join fetch l.product p join fetch p.images where l.user = :user and p.status = 'A'")
+//        List<Likes> savedProducts(@Param("user") User user);
+        List<OrderSpecifier> ORDERS = productSort(pageable);
+        QueryResults<ProductDto> result = jpaQueryFactory
+                .select(Projections.constructor(ProductDto.class,
+                        product.productId,
+                        ExpressionUtils.as(
+                                JPAExpressions
+                                        .select(QFile.file.fileUrl)
+                                        .from(QFile.file)
+                                        .where(QFile.file.fileId.eq(
+                                                JPAExpressions
+                                                        .select(QFile.file.fileId.min())
+                                                        .from(QFile.file)
+                                                        .where(QFile.file.product.eq(product))
+                                        ))
+                                        .orderBy(QFile.file.updateAt.asc())
+                                , "imageUrl"
+                        ),
+                        product.title,
+                        product.sharePrice.divide(product.shareCount).as("unitPrice"),
+                        calculateWalkingDistance(longitude, latitude).as("walkingDistance"),
+                        calculateWalkingTime(longitude, latitude).as("walkingTime"),
+                        product.likeCount.as("totalLikes"),
+                        product.soldStatus.as("soldStatus"),
+                        likes.likeId,
+                        likes.likeStatus.as("liked")
+                ))
+                .from(product)
+                .innerJoin(likes)
+                .on(likes.product.eq(product).and(likes.user.eq(user)))
+                .where(product.status.eq("A"))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
