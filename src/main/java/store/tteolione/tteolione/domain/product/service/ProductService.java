@@ -21,6 +21,8 @@ public interface ProductService {
 
     Slice<ProductDto> getMyListProducts(double longitude, double latitude, String soldStatus, Pageable pageable);
 
+    Slice<ProductDto> getMySaveListProducts(double longitude, double latitude, Pageable pageable);
+
     Slice<ProductDto> getOpponentListProducts(double longitude, double latitude, Long opponentId, String soldStatus, Pageable pageable);
 
     String likeProduct(Long productId);
