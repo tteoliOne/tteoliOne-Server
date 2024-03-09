@@ -9,6 +9,7 @@ import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
 import jakarta.validation.Valid;
+
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -125,9 +126,10 @@ public class UserController {
     /**
      * 내 정보 수정
      */
-    @PatchMapping("")
-    public BaseResponse<String> editUserInfo(@Valid @RequestBody EditUserInfoRequest editUserInfoRequest) {
-        userService.editUserInfo(editUserInfoRequest);
+    @PatchMapping(path = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse<String> editUserInfo(@Valid @RequestPart(value = "editUserInfoRequest") EditUserInfoRequest editUserInfoRequest,
+                                             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+        userService.editUserInfo(editUserInfoRequest, profile);
         return BaseResponse.of("내 정보가 정상적으로 수정되었습니다.");
     }
 

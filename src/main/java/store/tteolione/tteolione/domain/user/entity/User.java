@@ -143,4 +143,8 @@ public class User extends BaseTimeEntity {
     public void changeIntro(String newIntro) {
         this.intro = newIntro;
     }
+
+    public void changeProfile(String newProfile) {
+        this.profile = newProfile;
+    }
 }
