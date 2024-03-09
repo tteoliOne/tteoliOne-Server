@@ -320,7 +320,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException(Code.EXIST_NICKNAME);
         }
 
-        if (profile != null && !profile.isEmpty()) {
+        if (profile != null) {
             String newProfile = s3Service.uploadFile(profile);
             user.changeProfile(newProfile);
         }
