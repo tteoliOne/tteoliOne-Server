@@ -157,7 +157,7 @@ public class UserController {
     /**
      * 회원 탈퇴
      */
-    @DeleteMapping("/{userId}")
+    @PostMapping("/{userId}")
     public BaseResponse<String> deleteUser(@PathVariable Long userId, @RequestBody OAuth2RevokeRequest oAuth2RevokeRequest) {
         userService.deleteUser(userId, oAuth2RevokeRequest);
         return BaseResponse.of("정상적으로 탈퇴 처리가 되었습니다.");
