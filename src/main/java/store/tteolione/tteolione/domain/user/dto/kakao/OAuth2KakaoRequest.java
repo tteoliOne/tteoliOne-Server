@@ -1,4 +1,4 @@
-package store.tteolione.tteolione.domain.user.dto;
+package store.tteolione.tteolione.domain.user.dto.kakao;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

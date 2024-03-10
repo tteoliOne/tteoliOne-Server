@@ -1,7 +1,6 @@
 package store.tteolione.tteolione.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,9 +32,6 @@ import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import store.tteolione.tteolione.infra.email.service.EmailService;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -56,9 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final S3Service s3Service;
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
-
-    @Value("{kakao.admin}")
-    private String kakaoAdminKey;
+    private final OAuth2LoginService oAuth2LoginService;
 
 
     @Override
@@ -359,7 +353,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId, OAuth2RevokeRequest oAuth2RevokeRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
 
@@ -373,7 +367,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         //TODO 다른 소셜 로그인도 서비스 종료시켜야됨
         if (user.getLoginType().equals(UserConstants.ELoginType.eKakao)) {
-            kakaoUnlinkAdmin(user.getProviderId());
+            oAuth2LoginService.kakaoRevoke(user.getProviderId());
+        } else if (user.getLoginType().equals(UserConstants.ELoginType.eApple)) {
+            oAuth2LoginService.appleRevoke(oAuth2RevokeRequest.getAuthorizationCode());
         }
 
     }
@@ -390,43 +386,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .set("RT:" + authenticationToken.getName(),
                         tokenInfoResponse.getRefreshToken(), tokenInfoResponse.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return tokenInfoResponse;
-    }
-
-    public void kakaoUnlinkAdmin(String providerId) {
-        String reqURL = "https://kapi.kakao.com/v1/user/unlink";
-        String APP_ADMIN_KEY = kakaoAdminKey;
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "KakaoAK " + APP_ADMIN_KEY);
-            conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-            conn.setDoOutput(true); // 서버에서 받을 값이 있다면 true
-
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-            StringBuilder sb = new StringBuilder();
-            sb.append("target_id_type=user_id");
-            sb.append("&target_id=" + providerId);
-            bw.write(sb.toString());
-            bw.flush();
-
-            int responseCode = conn.getResponseCode();
-            //System.out.println("responseCode : " + responseCode);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-            String result = "";
-            String line = "";
-
-            while ((line = br.readLine()) != null) {
-                result += line;
-            }
-            //System.out.println(result);
-
-            br.close();
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
