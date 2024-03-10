@@ -107,3 +107,13 @@ firebase:
 
 kakao:
   admin: ${KAKAO_ADMIN_KEY}
+
+apple:
+  grant-type: ${APPLE_GRANT_TYPE}
+  client-id: ${APPLE_CLIENT_ID}
+  key-id: ${APPLE_KEY_ID}
+  team-id: ${APPLE_TEAM_ID}
+  audience: ${APPLE_AUDIENCE}
+  private-key: ${APPLE_PRIVATE_KEY}
+  apple-auth:
+    url: ${APPLE_AUTH_URL}

@@ -65,6 +65,13 @@ jobs:
           AGGREGATION_GROUP_ID: ${{ secrets.AGGREGATION_GROUP_ID }}
           AGGREGATION_BROKER: ${{ secrets.AGGREGATION_BROKER }}
           KAKAO_ADMIN_KEY: ${{ secrets.KAKAO_ADMIN_KEY }}
+          APPLE_GRANT_TYPE: ${{ secrets.APPLE_GRANT_TYPE }}
+          APPLE_CLIENT_ID: ${{ secrets.APPLE_CLIENT_ID }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_AUDIENCE: ${{ secrets.APPLE_AUDIENCE }}
+          APPLE_PRIVATE_KEY: ${{ secrets.APPLE_PRIVATE_KEY }}
+          APPLE_AUTH_URL: ${{ secrets.APPLE_AUTH_URL }}
       - name: Create env file
         run: |
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
@@ -88,6 +95,13 @@ jobs:
           echo "AGGREGATION_GROUP_ID=${{ secrets.AGGREGATION_GROUP_ID }}" >> .env
           echo "AGGREGATION_BROKER=${{ secrets.AGGREGATION_BROKER }}" >> .env
           echo "KAKAO_ADMIN_KEY=${{ secrets.KAKAO_ADMIN_KEY }}" >> .env
+          echo "APPLE_GRANT_TYPE=${{ secrets.APPLE_GRANT_TYPE }}" >> .env
+          echo "APPLE_CLIENT_ID=${{ secrets.APPLE_CLIENT_ID }}" >> .env
+          echo "APPLE_KEY_ID=${{ secrets.APPLE_KEY_ID }}" >> .env
+          echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> .env
+          echo "APPLE_AUDIENCE=${{ secrets.APPLE_AUDIENCE }}" >> .env
+          echo "APPLE_PRIVATE_KEY=${{ secrets.APPLE_PRIVATE_KEY }}" >> .env
+          echo "APPLE_AUTH_URL=${{ secrets.APPLE_AUTH_URL }}" >> .env
 
       
 
