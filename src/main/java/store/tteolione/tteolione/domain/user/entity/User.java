@@ -101,16 +101,33 @@ public class User extends BaseTimeEntity {
     }
 
 
-    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile, String targetToken) {
+    public static User toKakaoUser(HashMap<String, Object> userInfo, String userProfile, String targetToken, String randomNickname) {
         return User.builder()
                 .loginId(userInfo.get("email").toString())
                 .username(userInfo.get("nickname").toString())
-                .nickname(userInfo.get("nickname").toString())
+                .nickname(randomNickname)
                 .profile(userProfile)
                 .email(userInfo.get("email").toString())
                 .targetToken(targetToken)
                 .loginType(ELoginType.eKakao)
                 .providerId(userInfo.get("kakaoUserId").toString())
+                .emailAuthChecked(true)
+                .activated(true)
+                .authorities(Collections.singleton(toRoleUserAuthority()))
+                .build();
+
+    }
+
+    public static User toAppleUser(HashMap<String, Object> userInfo, String userProfile, String targetToken, String randomNickname) {
+        return User.builder()
+                .loginId(userInfo.get("email").toString())
+                .username(randomNickname)
+                .nickname(randomNickname)
+                .profile(userProfile)
+                .email(userInfo.get("email").toString())
+                .targetToken(targetToken)
+                .loginType(ELoginType.eKakao)
+                .providerId(userInfo.get("sub").toString())
                 .emailAuthChecked(true)
                 .activated(true)
                 .authorities(Collections.singleton(toRoleUserAuthority()))

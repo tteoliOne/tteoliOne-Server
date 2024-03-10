@@ -41,5 +41,5 @@ public interface UserService {
 
     SimpleProfileResponse getSimpleProfile(Long userId);
 
-    void deleteUser(Long userId);
+    void deleteUser(Long userId, OAuth2RevokeRequest oAuth2RevokeRequest);
 }

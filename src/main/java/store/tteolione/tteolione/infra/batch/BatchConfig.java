@@ -12,7 +12,7 @@ public class BatchConfig {
 
     private final BatchService batchService;
 
-    @Scheduled(cron = "0 0 6 * * *") // 운영
+//    @Scheduled(cron = "0 0 6 * * *") // 운영
 //    @Scheduled(cron = "0 * * * * *") // 테스트
     public void runWithDrawUserJob() {
         LocalDateTime updateDate = LocalDateTime

@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.user.dto.*;
+import store.tteolione.tteolione.domain.user.dto.OAuth2RevokeRequest;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
 
@@ -157,8 +158,8 @@ public class UserController {
      * 회원 탈퇴
      */
     @DeleteMapping("/{userId}")
-    public BaseResponse<String> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    public BaseResponse<String> deleteUser(@PathVariable Long userId, @RequestBody OAuth2RevokeRequest oAuth2RevokeRequest) {
+        userService.deleteUser(userId, oAuth2RevokeRequest);
         return BaseResponse.of("정상적으로 탈퇴 처리가 되었습니다.");
     }
 }

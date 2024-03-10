@@ -1,6 +1,7 @@
 package store.tteolione.tteolione.domain.user.dto;
 
 import lombok.*;
+import store.tteolione.tteolione.domain.user.dto.apple.AppleIdTokenPayload;
 import store.tteolione.tteolione.domain.user.entity.User;
 
 import java.util.HashMap;
@@ -36,6 +37,16 @@ public class LoginResponse {
                 .accessToken(tokenInfoResponse.getAccessToken())
                 .refreshToken(tokenInfoResponse.getRefreshToken())
                 .nickname(user.getNickname())
+                .build();
+    }
+
+    public static LoginResponse fromApple(TokenInfoResponse tokenInfoResponse, HashMap<String, Object> userInfo, boolean existsUser, User user) {
+        return LoginResponse.builder()
+                .existsUser(existsUser)
+                .userId(userInfo == null ? null : Long.valueOf(userInfo.get("userId").toString()))
+                .accessToken(tokenInfoResponse == null ? null : tokenInfoResponse.getAccessToken())
+                .refreshToken(tokenInfoResponse == null ? null : tokenInfoResponse.getRefreshToken())
+                .nickname(userInfo == null ? null : user.getNickname())
                 .build();
     }
 }

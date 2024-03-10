@@ -2,7 +2,6 @@ package store.tteolione.tteolione.global.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import store.tteolione.tteolione.domain.user.dto.KakaoUserInfoResponse;
 import store.tteolione.tteolione.domain.user.entity.Authority;
 import store.tteolione.tteolione.domain.user.entity.User;
 
@@ -26,6 +25,9 @@ public class OAuth2Attribute {
         switch (provider) {
             case "kakao":
                 return ofKakao("email", attributes);
+            case "apple":
+                return ofApple("email", attributes);
+
             default:
                 throw new RuntimeException();
         }
@@ -38,6 +40,18 @@ public class OAuth2Attribute {
                 .name((String) attributes.get("nickname"))
                 .email((String) attributes.get("email"))
                 .picture((String)attributes.get("profile"))
+                .attributes(attributes)
+                .attributeKey(attributeKey)
+                .build();
+    }
+
+    private static OAuth2Attribute ofApple(String attributeKey,
+                                           Map<String, Object> attributes) {
+
+        return OAuth2Attribute.builder()
+                .name((String) attributes.get("sub"))
+                .email((String) attributes.get("email"))
+                .picture(null)
                 .attributes(attributes)
                 .attributeKey(attributeKey)
                 .build();
