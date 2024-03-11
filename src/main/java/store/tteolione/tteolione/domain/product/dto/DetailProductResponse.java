@@ -24,6 +24,7 @@ public class DetailProductResponse {
     private List<String> images; //상품사진
     private String sellerProfile; //판매자 프로필
     private String receipt;//영수증사진
+    private Long sellerId;
     private String sellerNickname; //판매자 닉네임
     private String title; //제목
     private LocalDateTime buyDate;//구매일자
@@ -48,6 +49,7 @@ public class DetailProductResponse {
                 .images(productImages)
                 .sellerProfile(product.getUser().getProfile())
                 .receipt(receiptImage)
+                .sellerId(product.getUser().getUserId())
                 .sellerNickname(product.getUser().getNickname())
                 .title(product.getTitle())
                 .buyDate(product.getBuyDate())
