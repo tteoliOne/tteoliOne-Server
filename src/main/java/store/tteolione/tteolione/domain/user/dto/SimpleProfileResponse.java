@@ -12,6 +12,7 @@ public class SimpleProfileResponse {
     private String profile;
     private String nickname;
     private String intro;
+    private double ddabongScore;
     private int newProductCount;
     private int soldOutProductCount;
     private int reviewCount;

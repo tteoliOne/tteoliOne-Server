@@ -343,6 +343,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .profile(findUser.getProfile())
                 .nickname(findUser.getNickname())
                 .intro(findUser.getIntro())
+                .ddabongScore(findUser.getDdabongScore())
                 .newProductCount(newProductCount)
                 .soldOutProductCount(soldOutProductCount)
                 .reviewCount(reviewCount)
