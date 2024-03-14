@@ -66,6 +66,8 @@ public class SecurityConfig {
                                         .requestMatchers("/ws-stomp/**").permitAll()
                                         .requestMatchers("/api/users/kakao").permitAll()
                                         .requestMatchers("/api/users/kakao/profile").permitAll()
+                                        .requestMatchers("/api/users/apple").permitAll()
+                                        .requestMatchers("/api/users/apple/profile").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/email/send/signup").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/email/verify/signup").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
