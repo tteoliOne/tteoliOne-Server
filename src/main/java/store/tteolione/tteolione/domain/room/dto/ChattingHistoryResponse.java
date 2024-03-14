@@ -26,7 +26,9 @@ public class ChattingHistoryResponse {
     private String opponentProfile; //상대 프로필
     private boolean exitOpponent; //상대 채팅방 나감 여부
     private ProductConstants.EProductSoldStatus soldStatus; //상품 상태
-    private boolean checkSeller;
+    private boolean checkSeller; //판매자인지 판단
+    private boolean checkReservation; //로그인유저가 예약중인 상태인지
+    private boolean checkReview; //상품이 리뷰가 등록되어있는지
     private List<ChatResponse> chatList; // 채팅 기록들
 
 }
