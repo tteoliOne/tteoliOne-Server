@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.notification.service.NotificationService;
 import store.tteolione.tteolione.domain.product.entity.Product;
 import store.tteolione.tteolione.domain.product.repository.ProductRepository;
+import store.tteolione.tteolione.domain.product.repository.ProductTradeRepository;
+import store.tteolione.tteolione.domain.review.repository.ReviewRepository;
 import store.tteolione.tteolione.domain.room.dto.*;
 import store.tteolione.tteolione.domain.room.dto.chat.Message;
 import store.tteolione.tteolione.domain.room.entity.Chat;
@@ -51,6 +53,8 @@ public class ChatService {
     private final ChatRoomService chatRoomService;
     private final NotificationService notificationService;
     private final ProductRepository productRepository;
+    private final ProductTradeRepository productTradeRepository;
+    private final ReviewRepository reviewRepository;
 
 
     public Chat createChatRoom(CreateChatRoomRequest createChatRoomDto) {
@@ -146,7 +150,12 @@ public class ChatService {
         }
 
         //자신이 판매자인지
-        boolean checkSeller = findProduct.getUser().getUserId().equals(user.getUserId()); //판매자가 JWT토큰과 일치할때
+        boolean checkSeller = findProduct.getUser().getUserId().equals(user.getUserId()); //판매자가 JWT 토큰과 일치할때
+
+        boolean checkReservation = checkSeller ?
+                productTradeRepository.existsByProductAndBuyer(findProduct, opponentUser) : productTradeRepository.existsByProductAndBuyer(findProduct, user);
+
+        boolean checkReview = reviewRepository.existsByProduct(findProduct);
 
         return ChattingHistoryResponse.builder()
                 .loginId(user.getLoginId())
@@ -160,6 +169,8 @@ public class ChatService {
                 .exitOpponent(checkSeller ? findChatRoom.isExitCreateMember() : findChatRoom.isExitJoinMember())
                 .soldStatus(findProduct.getSoldStatus())
                 .checkSeller(checkSeller)
+                .checkReservation(checkReservation)
+                .checkReview(checkReview)
                 .chatList(chattingList)
                 .build();
     }
