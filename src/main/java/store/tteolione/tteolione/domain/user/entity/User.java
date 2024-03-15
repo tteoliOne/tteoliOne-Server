@@ -126,7 +126,7 @@ public class User extends BaseTimeEntity {
                 .profile(userProfile)
                 .email(userInfo.get("email").toString())
                 .targetToken(targetToken)
-                .loginType(ELoginType.eKakao)
+                .loginType(ELoginType.eApple)
                 .providerId(userInfo.get("sub").toString())
                 .emailAuthChecked(true)
                 .activated(true)

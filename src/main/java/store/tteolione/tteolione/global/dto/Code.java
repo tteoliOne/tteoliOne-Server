@@ -59,6 +59,8 @@ public enum Code {
     NOT_EXISTS_REPORT_CATEGORY(136, HttpStatus.BAD_REQUEST, "존재하지 않는 신고 카테고리입니다."),
     EQUAL_SELLER_BUYER(137, HttpStatus.BAD_REQUEST, "구매자와 판매자가 동일 회원입니다."),
     APPLE_FEIGN_API_ERROR(138, HttpStatus.BAD_REQUEST, "애플 소셜 로그인 Feign API Feign Client 호출 오류"),
+    EMPTY_APPLE_AUTHORZITION_CODE(139, HttpStatus.BAD_REQUEST, "애플의 인가코드를 입력해 주세요."),
+    EMPTY_APPLE_REFRESH_TOKEN(140, HttpStatus.BAD_REQUEST, "애플의 리프레쉬 토큰을 입력해 주세요."),
 
 
 

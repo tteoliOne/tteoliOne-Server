@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OAuth2AppleRequest {
 
-    @NotBlank(message = "애플의 인가코드를 입력해 주세요.")
     private String authorization;
-
     private String targetToken;
+    private String appleRefreshToken;
 }
