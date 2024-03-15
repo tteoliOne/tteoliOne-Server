@@ -1,8 +1,10 @@
 package store.tteolione.tteolione.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import store.tteolione.tteolione.domain.category.service.CategoryService;
 import store.tteolione.tteolione.domain.file.entity.File;
 import store.tteolione.tteolione.domain.file.service.FileService;
 import store.tteolione.tteolione.domain.likes.entity.Likes;
+import store.tteolione.tteolione.domain.likes.repository.LikesRepository;
 import store.tteolione.tteolione.domain.likes.service.LikesService;
 import store.tteolione.tteolione.domain.product.constants.ProductConstants;
 import store.tteolione.tteolione.domain.product.dto.*;
@@ -31,6 +34,8 @@ import store.tteolione.tteolione.global.exception.GeneralException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final LikesService likesService;
+    private final LikesRepository likesRepository;
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
     private final ReviewService reviewService;
@@ -101,6 +107,68 @@ public class ProductServiceImpl implements ProductService {
         Slice<ProductDto> listProductDtoByProducts = productRepository.findListProductDtoByProducts(category, user, longitude, latitude, searchStartDate, searchEndDate, pageable);
 
         return listProductDtoByProducts;
+    }
+
+    @Override
+    public Slice<ProductDto> getPreviousProductDto(Long categoryId, double longitude, double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+
+        Category category = categoryService.findByCategoryId(categoryId);
+
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createAt")
+        );
+        Slice<ProductDto> listProcustDtos = productRepository.findByProductDto(category, LocalDateTime.of(searchStartDate, LocalTime.MIN), LocalDateTime.of(searchEndDate, LocalTime.MAX).withNano(0), newPageable);
+        getCheckProduct(user, listProcustDtos, longitude, latitude);
+
+
+        return listProcustDtos;
+    }
+
+    private void getCheckProduct(User user, Slice<ProductDto> listProcustDtos, double longitude, double latitude) {
+        for (ProductDto listProcustDto : listProcustDtos) {
+            Optional<Likes> findLike = likesRepository.findByProductIdAndUser(listProcustDto.getProductId(), user);
+            if (findLike.isEmpty()) {
+                listProcustDto.setLiked(false);
+                listProcustDto.setLikeId(null);
+            } else {
+                listProcustDto.setLikeId(findLike.get().getLikeId());
+                listProcustDto.setLiked(true);
+            }
+            listProcustDto.setWalkingDistance(distance(listProcustDto.getLatitude(), listProcustDto.getLatitude(), latitude, longitude, "meter"));
+        }
+    }
+
+    private double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+
+        if (unit == "kilometer") {
+            dist = dist * 1.609344;
+        } else if(unit == "meter"){
+            dist = dist * 1609.344;
+        }
+
+        return (dist);
+    }
+
+
+    // This function converts decimal degrees to radians
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    // This function converts radians to decimal degrees
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
     }
 
     @Override

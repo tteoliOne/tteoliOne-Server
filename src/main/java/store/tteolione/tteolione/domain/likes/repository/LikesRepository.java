@@ -17,4 +17,7 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
     @Query("select distinct l from Likes l join fetch l.product p join fetch p.images where l.user = :user and p.status = 'A'")
     List<Likes> savedProducts(@Param("user") User user);
 
+    @Query("select l from Likes l where l.product.productId = :productId AND l.user = :user")
+    Optional<Likes> findByProductIdAndUser(@Param("productId") Long productId, @Param("user") User user);
+
 }

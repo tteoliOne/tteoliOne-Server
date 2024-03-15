@@ -186,4 +186,19 @@ public class ProductController {
         productService.reviewProduct(productId, postReviewRequest);
         return BaseResponse.of("정상적으로 후기 작성하였습니다.");
     }
+
+    /**
+     * 상품 이전 목록 조회
+     */
+    @GetMapping("/s")
+    public BaseResponse<Slice<ProductDto>> getListProductss(@RequestParam Long categoryId,
+                                                           @RequestParam Double longitude,
+                                                           @RequestParam Double latitude,
+                                                           @RequestParam(required = false, defaultValue = "19000101") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchStartDate,
+                                                           @RequestParam(required = false, defaultValue = "99991231") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate searchEndDate,
+                                                           Pageable pageable
+    ) {
+        Slice<ProductDto> simpleProductResponse = productService.getPreviousProductDto(categoryId, longitude, latitude, searchStartDate, searchEndDate, pageable);
+        return BaseResponse.of(simpleProductResponse);
+    }
 }
