@@ -281,20 +281,16 @@ public class ChatService {
             findChatRoom.setExitCreateMember();
         }
 
-        // -- 상대방이 현재 채팅방에 입장해있을때, 바로 보내게 하기 위함 -- //
-        //message 객체에 보낸시간, 보낸사람 userId, 닉네임 세팅
-        boolean allConnected = chatRoomService.isAllConnected(chatRoomId);
-        if (allConnected) {
-            Message message = Message.builder()
-                    .chatRoomNo(chatRoomId)
-                    .productNo(findChatRoom.getProductNo())
-                    .contentType("notice")
-                    .build();
-            message.setSendTimeAndSender(LocalDateTime.now(), user.getUserId(), user.getNickname(), user.getLoginId(), 0);
+        Message message = Message.builder()
+                .chatRoomNo(chatRoomId)
+                .productNo(findChatRoom.getProductNo())
+                .contentType("notice")
+                .content("상대방이 채팅방을 나갔습니다.")
+                .build();
+        message.setSendTimeAndSender(LocalDateTime.now(), user.getUserId(), user.getNickname(), user.getLoginId(), 0);
 
-            //메시지 전송
-            sender.send(ConstantUtils.KAFKA_TOPIC, message);
-        }
+        //메시지 전송
+        sender.send(ConstantUtils.KAFKA_TOPIC, message);
 
     }
 
