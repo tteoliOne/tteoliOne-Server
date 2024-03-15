@@ -304,6 +304,7 @@ public class ChatService {
         Message message = Message.builder()
                 .chatRoomNo(chatRoomId)
                 .contentType(type)
+                .content("거래 상태 변경되었습니다.")
                 .build();
 
         //메시지 전송
