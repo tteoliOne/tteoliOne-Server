@@ -14,10 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
-import store.tteolione.tteolione.domain.user.dto.apple.AppleIdTokenPayload;
-import store.tteolione.tteolione.domain.user.dto.apple.AppleRevokeRequest;
-import store.tteolione.tteolione.domain.user.dto.apple.GetAppleUserInfoService;
-import store.tteolione.tteolione.domain.user.dto.apple.OAuth2AppleRequest;
+import store.tteolione.tteolione.domain.user.dto.apple.*;
 import store.tteolione.tteolione.domain.user.dto.kakao.KakaoAuthClient;
 import store.tteolione.tteolione.domain.user.dto.kakao.KakaoRevokeRequest;
 import store.tteolione.tteolione.domain.user.dto.kakao.KakaoUserInfoResponse;
@@ -161,17 +158,21 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
 
     @Override
     public LoginResponse validateAppleIdToken(OAuth2AppleRequest oAuth2AppleRequest) {
-
+        if (oAuth2AppleRequest.getAuthorization() == null) {
+            throw new GeneralException(Code.EMPTY_APPLE_AUTHORZITION_CODE);
+        }
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(UserConstants.EAuthority.eRoleUser.getValue()));
-        AppleIdTokenPayload appleIdTokenPayload = getAppleUserInfoService.get(oAuth2AppleRequest.getAuthorization());
-        HashMap<String, Object> userInfo = getAppleUserInfoHashMap(appleIdTokenPayload);
+        AppleIdTokenPayloadAndRefreshToken appleIdTokenPayloadAndRefreshToken = getAppleUserInfoService.getIdTokenPayloadAndRefreshToken(oAuth2AppleRequest.getAuthorization());
+        String appleRefreshToken = appleIdTokenPayloadAndRefreshToken.getRefreshToken();
+        AppleIdTokenPayload appleIdTokenPayload = appleIdTokenPayloadAndRefreshToken.getAppleIdTokenPayload();
+        HashMap<String, Object> userInfo = getAppleUserInfoHashMap(appleIdTokenPayloadAndRefreshToken.getAppleIdTokenPayload());
         User saveUser;
         Optional<User> _user = userRepository.findByLoginTypeAndProviderId(UserConstants.ELoginType.eApple, appleIdTokenPayload.getSub());
 
         //회원가입
         if (!_user.isPresent()) {
-            return LoginResponse.fromApple(null, null, false, null);
+            return LoginResponse.fromAppleNRU(null, null, false, null, appleRefreshToken);
         } else {
             //회원가입된 유저
             saveUser = _user.get();
@@ -187,7 +188,7 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
             }
 
             saveUser.setTargetToken(oAuth2AppleRequest.getTargetToken());
-            saveUser.setProviderId(appleIdTokenPayload.getSub());
+            saveUser.setProviderId(appleIdTokenPayloadAndRefreshToken.getAppleIdTokenPayload().getSub());
         }
         userInfo.put("userId", saveUser.getUserId());
 
@@ -207,9 +208,12 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
 
     @Override
     public LoginResponse signUpApple(MultipartFile profile, OAuth2AppleRequest oAuth2AppleRequest) throws IOException {
+        if (oAuth2AppleRequest.getAppleRefreshToken() == null) {
+            throw new GeneralException(Code.EMPTY_APPLE_REFRESH_TOKEN);
+        }
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(UserConstants.EAuthority.eRoleUser.getValue()));
-        AppleIdTokenPayload appleIdTokenPayload = getAppleUserInfoService.get(oAuth2AppleRequest.getAuthorization());
+        AppleIdTokenPayload appleIdTokenPayload = getAppleUserInfoService.getReissueIdTokenPayload(oAuth2AppleRequest.getAppleRefreshToken());
 
         HashMap<String, Object> userInfo = getAppleUserInfoHashMap(appleIdTokenPayload);
 

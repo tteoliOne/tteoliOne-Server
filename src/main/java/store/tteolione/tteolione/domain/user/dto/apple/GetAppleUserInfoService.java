@@ -50,6 +50,33 @@ public class GetAppleUserInfoService {
         return accessToken;
     }
 
+    public AppleIdTokenPayloadAndRefreshToken getIdTokenPayloadAndRefreshToken(String authorizationCode) {
+
+        AppleSocialTokenInfoResponse tokenInfo = appleAuthClient.getIdToken(
+                appleProperties.getClientId(),
+                generateClientSecret(),
+                appleProperties.getGrantType(),
+                authorizationCode
+        );
+        String refreshToken = tokenInfo.getRefreshToken();
+        AppleIdTokenPayload appleIdTokenPayload = TokenDecoder.decodePayload(tokenInfo.getIdToken(), AppleIdTokenPayload.class);
+        AppleIdTokenPayloadAndRefreshToken appleIdTokenPayloadAndRefreshToken = new AppleIdTokenPayloadAndRefreshToken(refreshToken, appleIdTokenPayload);
+
+        return appleIdTokenPayloadAndRefreshToken;
+    }
+
+    public AppleIdTokenPayload getReissueIdTokenPayload(String refreshToken) {
+
+        String idToken = appleAuthClient.getReissueToken(
+                appleProperties.getClientId(),
+                generateClientSecret(),
+                "refresh_token",
+                refreshToken
+        ).getIdToken();
+
+        return TokenDecoder.decodePayload(idToken, AppleIdTokenPayload.class);
+    }
+
     private String generateClientSecret() {
 
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);

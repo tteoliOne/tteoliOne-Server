@@ -24,5 +24,12 @@ public interface AppleAuthClient {
     @PostMapping(value = "/auth/revoke", consumes = "application/x-www-form-urlencoded")
     void revoke(AppleRevokeRequest revokeRequest);
 
+    @PostMapping(value = "/auth/token", consumes = "application/x-www-form-urlencoded")
+    AppleSocialTokenInfoResponse getReissueToken(
+            @RequestParam("client_id") String clientId,
+            @RequestParam("client_secret") String clientSecret,
+            @RequestParam("grant_type") String grantType,
+            @RequestParam("refresh_token") String refreshToken
+    );
 
 }
