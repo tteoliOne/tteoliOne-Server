@@ -70,9 +70,17 @@ public class ChatService {
         Optional<Chat> _findChat = chatRepository.findByProductNoAndCreateMember(findProduct.getProductId(), findUser.getUserId());
         if (_findChat.isPresent()) {
             Chat findChat = _findChat.get();
-            if (!(findChat.isExitCreateMember() || findChat.isExitJoinMember())) {
+
+            //구매자가 떠났거나 판매자가 떠났을 때
+            if (findChat.isExitCreateMember() || findChat.isExitJoinMember()) {
+                //기존 채팅방 삭제
+                chatRepository.delete(findChat);
+            }
+            //구매자와 판매자 모두가 떠나지 않았을 때
+            if (!findChat.isExitCreateMember() && !findChat.isExitJoinMember()) {
                 return findChat;
             }
+
         }
 
 
