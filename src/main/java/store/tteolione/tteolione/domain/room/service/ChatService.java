@@ -297,4 +297,19 @@ public class ChatService {
         }
 
     }
+
+    public void productTradeSend(Long chatRoomId, String type) {
+        // -- 상대방이 현재 채팅방에 입장해있을때, 바로 보내게 하기 위함 -- //
+        //message 객체에 보낸시간, 보낸사람 userId, 닉네임 세팅
+        boolean allConnected = chatRoomService.isAllConnected(chatRoomId);
+        if (allConnected) {
+            Message message = Message.builder()
+                    .chatRoomNo(chatRoomId)
+                    .contentType(type)
+                    .build();
+
+            //메시지 전송
+            sender.send(ConstantUtils.KAFKA_TOPIC, message);
+        }
+    }
 }

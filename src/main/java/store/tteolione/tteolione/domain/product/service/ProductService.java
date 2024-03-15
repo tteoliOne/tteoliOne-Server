@@ -37,11 +37,11 @@ public interface ProductService {
 
     SearchProductResponse searchProductList(User user, String query, Double longitude, Double latitude, LocalDate searchStartDate, LocalDate searchEndDate, Pageable pageable);
 
-    void requestProduct(Long productId);
+    void requestProduct(Long productId, Long chatRoomId);
 
-    void approveProduct(Long productId, Long receiverId);
+    void approveProduct(Long productId, Long receiverId, Long chatRoomId);
 
-    void rejectProduct(Long productId, Long receiverId);
+    void rejectProduct(Long productId, Long receiverId, Long chatRoomId);
 
     void reviewProduct(Long productId, PostReviewRequest postReviewRequest);
 

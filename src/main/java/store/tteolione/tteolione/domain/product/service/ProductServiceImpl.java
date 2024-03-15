@@ -23,6 +23,7 @@ import store.tteolione.tteolione.domain.notification.service.NotificationService
 import store.tteolione.tteolione.domain.product.repository.ProductTradeRepository;
 import store.tteolione.tteolione.domain.review.entity.Review;
 import store.tteolione.tteolione.domain.review.service.ReviewService;
+import store.tteolione.tteolione.domain.room.service.ChatService;
 import store.tteolione.tteolione.domain.search.dto.SearchProductResponse;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.service.UserService;
@@ -48,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
     private final NotificationService notificationService;
     private final ReviewService reviewService;
     private final ProductTradeRepository productTradeRepository;
+    private final ChatService chatService;
 
     @Override
     public PostProductResponse saveProduct(List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
@@ -237,7 +239,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void requestProduct(Long productId) {
+    public void requestProduct(Long productId, Long chatRoomId) {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
 
         //상품이 이미 예약중이면 요청 불가
@@ -258,10 +260,13 @@ public class ProductServiceImpl implements ProductService {
 
         //공유를 요청하였으므로 예약중임
         product.setSoldStatus(ProductConstants.EProductSoldStatus.eReservation);
+
+        //거래 상태 변동 보내기
+        chatService.productTradeSend(chatRoomId, "request");
     }
 
     @Override
-    public void approveProduct(Long productId, Long buyerId) {
+    public void approveProduct(Long productId, Long buyerId, Long chatRoomId) {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName()); //판매자
@@ -291,10 +296,13 @@ public class ProductServiceImpl implements ProductService {
 
         //공유 승인을 하였으므로 공유가 완료되었음
         product.setSoldStatus(ProductConstants.EProductSoldStatus.eSoldOut);
+
+        //거래 상태 변동 보내기
+        chatService.productTradeSend(chatRoomId, "approve");
     }
 
     @Override
-    public void rejectProduct(Long productId, Long buyerId) {
+    public void rejectProduct(Long productId, Long buyerId, Long chatRoomId) {
         Product product = productRepository.findByDetailProduct(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
@@ -321,6 +329,9 @@ public class ProductServiceImpl implements ProductService {
 
         //공유 거절을 하였으므로 새 상품으로
         product.setSoldStatus(ProductConstants.EProductSoldStatus.eNew);
+
+        //거래 상태 변동 보내기
+        chatService.productTradeSend(chatRoomId, "reject");
     }
 
     @Override
