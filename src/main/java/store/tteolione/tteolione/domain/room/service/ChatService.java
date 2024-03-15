@@ -89,6 +89,7 @@ public class ChatService {
                 .createMember(findUser.getUserId())
                 .joinMember(findProduct.getUser().getUserId())
                 .regDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
                 .exitCreateMember(false)
                 .exitJoinMember(false)
                 .build();
@@ -267,6 +268,8 @@ public class ChatService {
             // 저장된 고유 ID를 반환한다.
             message.setId(savedChat.getId());
         }
+
+        chatRoom.newUpdateDate();
 
         return message;
     }
