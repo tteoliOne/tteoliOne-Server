@@ -61,7 +61,7 @@ public class ChatQueryService {
                 ))
                 .from(QChat.chat)
                 .join(QProduct.product).on(QProduct.product.productId.eq(QChat.chat.productNo))
-                .where(QChat.chat.createMember.eq(userId).or(QChat.chat.joinMember.eq(userId)), productNoEq(productNo))
+                .where((QChat.chat.createMember.eq(userId).and(QChat.chat.exitCreateMember.eq(false))).or(QChat.chat.joinMember.eq(userId).and(QChat.chat.exitJoinMember.eq(false))), productNoEq(productNo))
                 .fetch();
 
         return result;
