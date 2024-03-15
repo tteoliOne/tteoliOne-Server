@@ -62,6 +62,7 @@ public class ChatQueryService {
                 .from(QChat.chat)
                 .join(QProduct.product).on(QProduct.product.productId.eq(QChat.chat.productNo))
                 .where((QChat.chat.createMember.eq(userId).and(QChat.chat.exitCreateMember.eq(false))).or(QChat.chat.joinMember.eq(userId).and(QChat.chat.exitJoinMember.eq(false))), productNoEq(productNo))
+                .orderBy(QChat.chat.updateDate.desc(), QChat.chat.regDate.desc())
                 .fetch();
 
         return result;

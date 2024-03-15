@@ -29,6 +29,8 @@ public class Chat {
 
     private boolean exitJoinMember;
 
+    private LocalDateTime updateDate;
+
     public void exitCreateMember() {
 //        this.createMember = null;
         this.exitCreateMember = true;
@@ -37,5 +39,9 @@ public class Chat {
     public void exitJoinMember() {
 //        this.joinMember = null;
         this.exitJoinMember = true;
+    }
+
+    public void newUpdateDate() {
+        this.updateDate = LocalDateTime.now();
     }
 }
