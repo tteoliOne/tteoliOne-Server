@@ -151,29 +151,32 @@ public class ProductController {
     /**
      * 공유 요청
      */
-    @PutMapping("/{productId}/request")
-    public BaseResponse<String> requestProduct(@PathVariable("productId") Long productId) {
-        productService.requestProduct(productId);
+    @PutMapping("/{productId}/chatRoom/{chatRoomId}/request")
+    public BaseResponse<String> requestProduct(@PathVariable("productId") Long productId,
+                                               @PathVariable("chatRoomId") Long chatRoomId) {
+        productService.requestProduct(productId, chatRoomId);
         return BaseResponse.of("정상적으로 요청되었습니다.");
     }
 
     /**
      * 공유 승인
      */
-    @PutMapping("/{productId}/approve")
+    @PutMapping("/{productId}/chatRoom/{chatRoomId}/approve")
     public BaseResponse<String> approveProduct(@PathVariable("productId") Long productId,
+                                               @PathVariable("chatRoomId") Long chatRoomId,
                                                @RequestBody TradeProductRequest tradeProductRequest) {
-        productService.approveProduct(productId, tradeProductRequest.getBuyerId());
+        productService.approveProduct(productId, tradeProductRequest.getBuyerId(), chatRoomId);
         return BaseResponse.of("정상적으로 승인되었습니다.");
     }
 
     /**
      * 공유 거절
      */
-    @PutMapping("/{productId}/reject")
+    @PutMapping("/{productId}/chatRoom/{chatRoomId}/reject")
     public BaseResponse<String> rejectProduct(@PathVariable("productId") Long productId,
+                                              @PathVariable("chatRoomId") Long chatRoomId,
                                               @RequestBody TradeProductRequest tradeProductRequest) {
-        productService.rejectProduct(productId, tradeProductRequest.getBuyerId());
+        productService.rejectProduct(productId, tradeProductRequest.getBuyerId(), chatRoomId);
         return BaseResponse.of("정상적으로 거절되었습니다.");
     }
 
