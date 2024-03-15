@@ -235,11 +235,19 @@ public class ChatService {
         User findUser = userRepository.findById(message.getSenderNo()).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
         Product findProduct = productRepository.findById(message.getProductNo()).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
 
+        Chat chatRoom = chatRepository.findByChatId(message.getChatRoomNo()).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_CHAT_ROOM));
         //상대방이 읽지 않은 경우에만 알림 전송
         if (message.getReadCount().equals(1)) {
             User receiveUser = chatQueryService.getReceiverNumber(message.getChatRoomNo(), message.getSenderNo());
             String content = message.getContentType().equals("image") ? "image" : message.getContent();
-            notificationService.sendMessageTo(receiveUser.getTargetToken(), findProduct.getTitle(), findUser.getNickname() + " : " + content, "hello", "hi");
+            //메시지 받는 유저가 구매자인데 떠난 상태가 아닐 때
+            if (receiveUser.getUserId().equals(chatRoom.getCreateMember()) && !chatRoom.isExitCreateMember()) {
+                notificationService.sendMessageTo(receiveUser.getTargetToken(), findProduct.getTitle(), findUser.getNickname() + " : " + content, "hello", "hi");
+            }
+            //메시지 받는 유저가 판매자인데 떠난 상태가 아닐 때
+            if (receiveUser.getUserId().equals(chatRoom.getJoinMember()) && !chatRoom.isExitJoinMember()) {
+                notificationService.sendMessageTo(receiveUser.getTargetToken(), findProduct.getTitle(), findUser.getNickname() + " : " + content, "hello", "hi");
+            }
         }
 
         // 보낸 사람일 경우에만 메시지를 저장 -> 중복 저장 방지
@@ -275,10 +283,10 @@ public class ChatService {
         // -- 상대방이 구독이 안되어있을 때, 즉 채팅방을 나가있을때 떠난 것을 알 수가 없어 DB에 저장 -- //
         //떠나는 사람이 판매자일때
         if (checkSeller) {
-            findChatRoom.setExitJoinMember();
+            findChatRoom.exitJoinMember();
         } else {
             //떠나는 사람이 구매자일때
-            findChatRoom.setExitCreateMember();
+            findChatRoom.exitCreateMember();
         }
 
         Message message = Message.builder()
@@ -288,6 +296,13 @@ public class ChatService {
                 .content("상대방이 채팅방을 나갔습니다.")
                 .build();
         message.setSendTimeAndSender(LocalDateTime.now(), user.getUserId(), user.getNickname(), user.getLoginId(), 0);
+
+        // Message 객체를 채팅 엔티티로 변환한다.
+        Chatting chatting = message.toEntity();
+        // 채팅 내용을 저장한다.
+        Chatting savedChat = mongoChatRepository.save(chatting);
+        // 저장된 고유 ID를 반환한다.
+        message.setId(savedChat.getId());
 
         //메시지 전송
         sender.send(ConstantUtils.KAFKA_TOPIC, message);

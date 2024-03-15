@@ -3,7 +3,6 @@ package store.tteolione.tteolione.domain.room.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import store.tteolione.tteolione.domain.product.entity.Product;
 
 import java.time.LocalDateTime;
 
@@ -30,13 +29,13 @@ public class Chat {
 
     private boolean exitJoinMember;
 
-    public void setExitCreateMember() {
-        this.createMember = null;
+    public void exitCreateMember() {
+//        this.createMember = null;
         this.exitCreateMember = true;
     }
 
-    public void setExitJoinMember() {
-        this.joinMember = null;
+    public void exitJoinMember() {
+//        this.joinMember = null;
         this.exitJoinMember = true;
     }
 }
