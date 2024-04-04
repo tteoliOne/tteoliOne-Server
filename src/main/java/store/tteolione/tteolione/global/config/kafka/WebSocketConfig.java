@@ -23,7 +23,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp") // STOMP 엔드포인트 설정
                 .setAllowedOriginPatterns("*") // 모든 Origin 허용
-                .withSockJS(); // SockJS 사용가능 설정
+                .withSockJS() // SockJS 사용가능 설정
+                .setHeartbeatTime(300000);
         registry.setErrorHandler(chatErrorHandler);
     }
 
