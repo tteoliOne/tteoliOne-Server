@@ -309,7 +309,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new GeneralException(Code.NOT_MATCH_NEW_PW);
         }
 
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
 
         return "비밀번호 재설정 성공";
     }
