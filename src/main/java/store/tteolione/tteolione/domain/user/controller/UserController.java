@@ -107,6 +107,14 @@ public class UserController {
     }
 
     /**
+     * 비밀번호 재설정
+     */
+    @PatchMapping("/change/password")
+    public BaseResponse<String> resetPassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+        return BaseResponse.of(userService.changePassword(changePasswordRequest));
+    }
+
+    /**
      * 닉네임 변경
      */
     @PatchMapping("/nickname")

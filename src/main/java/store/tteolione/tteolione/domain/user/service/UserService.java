@@ -33,6 +33,8 @@ public interface UserService {
 
     String resetPassword(ResetPasswordRequest resetPasswordRequest);
 
+    String changePassword(ChangePasswordRequest changePasswordRequest);
+
     void changeNickname(ChangeNicknameRequest changeNicknameRequest);
 
     void editUserInfo(EditUserInfoRequest editUserInfoRequest, MultipartFile profile) throws IOException;

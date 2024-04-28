@@ -288,6 +288,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public String changePassword(ChangePasswordRequest changePasswordRequest) {
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = findByLoginId(loginId);
+
+        // 소셜로그인인지
+        switch (user.getLoginType()) {
+            case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+            case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+            case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+            case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
+        }
+
+        // 현재 비밀번호가 일치하지 않습니다.
+        if (!passwordEncoder.matches(changePasswordRequest.getPassword(), user.getPassword())) {
+            throw new GeneralException(Code.NOT_MATCH_PW);
+        }
+        // 새로운 비밀번호가 일치하지 않습니다.
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getNewPasswordConfirm())) {
+            throw new GeneralException(Code.NOT_MATCH_NEW_PW);
+        }
+
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+
+        return "비밀번호 재설정 성공";
+    }
+
+    @Override
     public void changeNickname(ChangeNicknameRequest changeNicknameRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByLoginId(authentication.getName());
