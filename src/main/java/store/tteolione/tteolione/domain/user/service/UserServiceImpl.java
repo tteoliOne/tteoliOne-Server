@@ -300,6 +300,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
 
+        if (changePasswordRequest.getPassword().equals(changePasswordRequest.getNewPassword())) {
+            throw new GeneralException(Code.EQUALS_PASSWORD_NEW_PASSWORD);
+        }
+
         // 현재 비밀번호가 일치하지 않습니다.
         if (!passwordEncoder.matches(changePasswordRequest.getPassword(), user.getPassword())) {
             throw new GeneralException(Code.NOT_MATCH_PW);
