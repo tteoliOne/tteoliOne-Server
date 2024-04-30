@@ -70,6 +70,7 @@ public enum Code {
     EXIST_NICKNAME(3001, HttpStatus.BAD_REQUEST, "중복된 닉네임입니다."),
     NOT_MATCH_PW(3002, HttpStatus.BAD_REQUEST, "현재 비밀번호가 일치하지 않습니다."),
     NOT_MATCH_NEW_PW(3003, HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
+    EQUALS_PASSWORD_NEW_PASSWORD(3004, HttpStatus.BAD_REQUEST, "기존 비밀번호 입력과 새로운 비밀번호 입력이 일치합니다."),
     EQUALS_NICKNAME(4000, HttpStatus.BAD_REQUEST, "기존 닉네임과 일치합니다."),
     NOT_EXISTS_PRODUCT(5000, HttpStatus.BAD_REQUEST, "상품이 존재하지 않습니다."),
 
