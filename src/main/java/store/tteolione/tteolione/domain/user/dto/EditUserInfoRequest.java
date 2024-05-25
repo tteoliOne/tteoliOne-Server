@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Size;
 public class EditUserInfoRequest {
 
     @NotBlank(message = "닉네임을 입력해주세요")
-    @Size(min = 2, max = 6, message = "닉네임은 2글자 이상 6글자 이하이여야 합니다.")
+    @Size(min = 2, max = 10, message = "닉네임은 2글자 이상 10글자 이하이여야 합니다.")
     private String nickname;
 
     private String intro;
