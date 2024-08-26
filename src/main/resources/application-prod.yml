@@ -117,3 +117,11 @@ apple:
   private-key: ${APPLE_PRIVATE_KEY}
   apple-auth:
     url: ${APPLE_AUTH_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    prometheus:
+      enabled: true
