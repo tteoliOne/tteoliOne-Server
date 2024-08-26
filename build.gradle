@@ -92,6 +92,11 @@ dependencies {
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
 	implementation 'org.bouncycastle:bcpkix-jdk15on:1.68'
 
+	//monitoring
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-core'
+
 }
 
 tasks.named('test') {
