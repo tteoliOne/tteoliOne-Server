@@ -80,6 +80,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.POST, "/api/users/find/password").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/users/verify/password").permitAll()
                                         .requestMatchers(HttpMethod.PATCH, "/api/users/reset/password").permitAll()
+                                        .requestMatchers("/actuator/**").permitAll()
                                         .requestMatchers("/api/items/**").access("hasRole('ROLE_USER')")
                                         .anyRequest().authenticated()
 
