@@ -87,8 +87,9 @@ services:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana.ini:/etc/grafana/grafana.ini  # 로컬 설정 파일을 매핑
+      - grafana-config:/etc/grafana  # 볼륨으로 설정
 
 volumes:
   redis-data:
   grafana-data:
+  grafana-config:  # 새로운 볼륨 추가
