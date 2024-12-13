@@ -1,4 +1,22 @@
 spring:
+  mail:
+    host: ${MAIL_V2_HOST}
+    port: ${MAIL_V2_PORT}
+    username: ${MAIL_V2_USERNAME}
+    password: ${MAIL_V2_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          #            required: true
+          auth: true
+          #          connectiontimeout: 5000
+          #          timeout: 5000
+          #          writetimeout: 5000
+          ssl:
+            #trust: smtp.naver.com
+            enable: true #??? ?? -> SSL ??? ?????
   config:
     activate:
       on-profile: prod
