@@ -72,6 +72,10 @@ jobs:
           APPLE_AUDIENCE: ${{ secrets.APPLE_AUDIENCE }}
           APPLE_PRIVATE_KEY: ${{ secrets.APPLE_PRIVATE_KEY }}
           APPLE_AUTH_URL: ${{ secrets.APPLE_AUTH_URL }}
+          MAIL_V2_HOST: ${{ secrets.MAIL_V2_HOST }}
+          MAIL_V2_PORT: ${{ secrets.MAIL_V2_PORT }}
+          MAIL_V2_USERNAME: ${{ secrets.MAIL_V2_USERNAME }}
+          MAIL_V2_PASSWORD: ${{ secrets.MAIL_V2_PASSWORD }}
       - name: Create env file
         run: |
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
@@ -102,8 +106,10 @@ jobs:
           echo "APPLE_AUDIENCE=${{ secrets.APPLE_AUDIENCE }}" >> .env
           echo "APPLE_PRIVATE_KEY=${{ secrets.APPLE_PRIVATE_KEY }}" >> .env
           echo "APPLE_AUTH_URL=${{ secrets.APPLE_AUTH_URL }}" >> .env
-
-      
+          echo "MAIL_V2_HOST=${{ secrets.MAIL_V2_HOST }}" >> .env
+          echo "MAIL_V2_PORT=${{ secrets.MAIL_V2_PORT }}" >> .env
+          echo "MAIL_V2_USERNAME=${{ secrets.MAIL_V2_USERNAME }}" >> .env
+          echo "MAIL_V2_PASSWORD=${{ secrets.MAIL_V2_PASSWORD }}" >> .env
 
 
       ## GitHub Actions에 도커 권한 부여
