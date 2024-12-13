@@ -1,4 +1,4 @@
-package store.tteolione.tteolione.infra.email.dto;
+package store.tteolione.tteolione.infra.email.dto.v1;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

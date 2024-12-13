@@ -97,6 +97,9 @@ dependencies {
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'io.micrometer:micrometer-core'
 
+	// thymeleaf
+	implementation 'org.thymeleaf:thymeleaf'
+
 }
 
 tasks.named('test') {
