@@ -70,6 +70,8 @@ public class SecurityConfig {
                                         .requestMatchers("/api/users/apple/profile").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/email/send/signup").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/email/verify/signup").permitAll()
+                                        .requestMatchers("/api/v2/email/send").permitAll()
+                                        .requestMatchers("/api/v2/email/verify").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/users/reissue").permitAll()

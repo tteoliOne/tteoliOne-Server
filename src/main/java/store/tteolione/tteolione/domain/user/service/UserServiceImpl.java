@@ -26,10 +26,10 @@ import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
 import store.tteolione.tteolione.global.service.S3Service;
-import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
+import store.tteolione.tteolione.infra.email.dto.v1.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
-import store.tteolione.tteolione.infra.email.service.EmailService;
+import store.tteolione.tteolione.infra.email.service.v1.EmailService;
 
 import java.io.*;
 import java.util.Collections;

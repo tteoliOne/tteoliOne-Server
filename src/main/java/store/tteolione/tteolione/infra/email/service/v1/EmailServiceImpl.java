@@ -1,4 +1,4 @@
-package store.tteolione.tteolione.infra.email.service;
+package store.tteolione.tteolione.infra.email.service.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
-import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
+import store.tteolione.tteolione.infra.email.dto.v1.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 

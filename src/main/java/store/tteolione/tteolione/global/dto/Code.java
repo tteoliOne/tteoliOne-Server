@@ -63,7 +63,10 @@ public enum Code {
     EMPTY_APPLE_REFRESH_TOKEN(140, HttpStatus.BAD_REQUEST, "애플의 리프레쉬 토큰을 입력해 주세요."),
 
 
-
+    BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "Bad request"),
+    VALIDATION_ERROR(400, HttpStatus.BAD_REQUEST, "Validation error"),
+    NOT_FOUND(403, HttpStatus.NOT_FOUND, "Requested resource is not found"),
+    METHOD_NOT_ALLOWED(405, HttpStatus.METHOD_NOT_ALLOWED, "Method Not Allowed"),
 
     NOT_MATCH_PRODUCT_USER(2000, HttpStatus.BAD_REQUEST, "판매자와 일치하지 않습니다."),
     MATCH_EXIST_PW(3000, HttpStatus.BAD_REQUEST, "기존 비밀번호와 일치합니다."),
@@ -74,14 +77,14 @@ public enum Code {
     EQUALS_NICKNAME(4000, HttpStatus.BAD_REQUEST, "기존 닉네임과 일치합니다."),
     NOT_EXISTS_PRODUCT(5000, HttpStatus.BAD_REQUEST, "상품이 존재하지 않습니다."),
 
-    BAD_REQUEST(10000, HttpStatus.BAD_REQUEST, "Bad request"),
-    VALIDATION_ERROR(10001, HttpStatus.BAD_REQUEST, "Validation error"),
-    NOT_FOUND(10002, HttpStatus.NOT_FOUND, "Requested resource is not found"),
+//    BAD_REQUEST(10000, HttpStatus.BAD_REQUEST, "Bad request"),
+//    VALIDATION_ERROR(10001, HttpStatus.BAD_REQUEST, "Validation error"),
+//    NOT_FOUND(10002, HttpStatus.NOT_FOUND, "Requested resource is not found"),
 
     INTERNAL_ERROR(20000, HttpStatus.INTERNAL_SERVER_ERROR, "Internal error"),
-    DATA_ACCESS_ERROR(20001, HttpStatus.INTERNAL_SERVER_ERROR, "Data access error"),
+    DATA_ACCESS_ERROR(20001, HttpStatus.INTERNAL_SERVER_ERROR, "Data access error");
 
-    UNAUTHORIZED(40000, HttpStatus.UNAUTHORIZED, "User unauthorized");
+//    UNAUTHORIZED(40000, HttpStatus.UNAUTHORIZED, "User unauthorized"), METHOD_NOT_ALLOWED(, , );
 
 
     private final Integer code;

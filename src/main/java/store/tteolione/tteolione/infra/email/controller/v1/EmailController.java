@@ -1,4 +1,4 @@
-package store.tteolione.tteolione.infra.email.controller;
+package store.tteolione.tteolione.infra.email.controller.v1;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import store.tteolione.tteolione.domain.user.service.UserService;
 import store.tteolione.tteolione.global.dto.BaseResponse;
-import store.tteolione.tteolione.infra.email.dto.SendEmailRequest;
-import store.tteolione.tteolione.infra.email.dto.VerifyEmailRequest;
-import store.tteolione.tteolione.infra.email.service.EmailService;
+import store.tteolione.tteolione.infra.email.dto.v1.SendEmailRequest;
+import store.tteolione.tteolione.infra.email.dto.v1.VerifyEmailRequest;
+import store.tteolione.tteolione.infra.email.service.v1.EmailService;
 
 
 @RestController
