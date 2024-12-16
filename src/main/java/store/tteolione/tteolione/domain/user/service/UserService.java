@@ -10,7 +10,7 @@ public interface UserService {
     User findByUserId(Long userId);
     void validateIsAlreadyRegisteredUser(String email);
     ReissueResponse reissueToken(ReissueRequest reissueRequest);
-    void signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException;
+    User signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException;
     void validateIsAlreadyRegisteredEmail(String email);
 
     LoginResponse loginUser(LoginRequest loginRequest);

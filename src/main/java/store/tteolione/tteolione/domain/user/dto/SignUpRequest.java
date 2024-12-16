@@ -7,7 +7,13 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.entity.User;
+
+import java.util.Collections;
+
+import static store.tteolione.tteolione.domain.user.entity.User.toRoleUserAuthority;
 
 
 @Getter
@@ -46,6 +52,21 @@ public class SignUpRequest {
                 .username(username)
                 .nickname(nickname)
                 .password(password)
+                .build();
+    }
+
+    public User toEntity(PasswordEncoder passwordEncoder, String imageUrl) {
+        return User.builder()
+                .loginId(this.loginId)
+                .email(this.email)
+                .username(this.username)
+                .nickname(this.nickname)
+                .password(passwordEncoder.encode(this.password))
+                .profile(imageUrl)
+                .emailAuthChecked(true)
+                .loginType(UserConstants.ELoginType.eApp)
+                .activated(true)
+                .authorities(Collections.singleton(toRoleUserAuthority()))
                 .build();
     }
 }

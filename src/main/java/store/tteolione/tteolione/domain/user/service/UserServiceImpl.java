@@ -110,14 +110,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException {
+    public User signUpUser(SignUpRequest signUpRequest, MultipartFile profile) throws IOException {
         //이미 등록된 회원인지
         validateIsAlreadyRegisteredUser(signUpRequest.getEmail());
         //보낸 이메일이 인증되었는지 확인
-        EmailAuth findEmailAuth = validateEmailAuthEntity(signUpRequest.getEmail());
+        EmailAuth emailAuth = validateEmailAuth(signUpRequest.getEmail());
         String saveProfile = s3Service.uploadFile(profile);
 
-        userRepository.save(User.toAppEntity(signUpRequest, passwordEncoder, findEmailAuth, saveProfile));
+        if (userRepository.existsByLoginId(signUpRequest.getLoginId())) {
+            throw new GeneralException(Code.EXISTS_LOGIN_ID);
+        }
+
+        User saveUser = userRepository.save(signUpRequest.toEntity(passwordEncoder, saveProfile));
+
+        //회원가입이 끝난 후 인증된 메일 삭제
+        emailAuthRepository.deleteByEmail(emailAuth.getEmail());
+        return saveUser;
     }
 
     @Override
@@ -125,13 +133,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByUserId(userId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
     }
 
-    private EmailAuth validateEmailAuthEntity(String email) {
-        EmailAuth emailAuth = emailAuthRepository.findTopByEmailOrderByUpdateAtDesc(email)
-                .orElseThrow(() -> new GeneralException(Code.VALIDATION_EMAIL)); //이메일 전송도 안되었을때
-        if (!emailAuth.isEmailAuthChecked()) {
-            throw new GeneralException(Code.VALIDATION_EMAIL);
-        }
-        return emailAuth;
+    private EmailAuth validateEmailAuth(String email) {
+        return emailAuthRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(Code.VALIDATION_EMAIL));
     }
 
     @Override
