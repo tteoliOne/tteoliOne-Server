@@ -49,12 +49,11 @@ public class EmailServiceV2Impl implements EmailServiceV2{
     @Override
     @Transactional
     public boolean verifyEmailCode(String email, String code, String codeFoundByEmail) {
-        log.info("Redis 인증코드 값 = {}", codeFoundByEmail);
-
         if (codeFoundByEmail == null) {
             throw new GeneralException(Code.VALIDATION_AUTHCODE);
         }
         boolean verifySuccess = codeFoundByEmail.equals(code);
+        emailAuthRepository.findByEmail(email).ifPresent(emailAuthRepository::delete);
         if (verifySuccess) {
             emailAuthRepository.save(EmailAuth.createEmailAuth(email));
             redisUtil.deleteData("code:"+email);

@@ -18,7 +18,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         String exception = (String)request.getAttribute("exception");
-        System.out.println(exception);
         if(exception == null) setResponse(response, ExceptionCode.ACCESS_DENIED);
         //잘못된 타입의 토큰인 경우
         else if(exception.equals(ExceptionCode.WRONG_TYPE_TOKEN.getCode())) setResponse(response, ExceptionCode.WRONG_TYPE_TOKEN);
