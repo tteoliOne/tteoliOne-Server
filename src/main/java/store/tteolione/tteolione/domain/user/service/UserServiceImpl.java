@@ -140,9 +140,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void validateIsAlreadyRegisteredUser(String email) {
-        Optional<User> findUser = userRepository.findByEmail(email);
-        if (findUser.isPresent()) {
-            User user = findUser.get();
+        userRepository.findByEmail(email).ifPresent(user -> {
             if (user.isEmailAuthChecked()) {
                 switch (user.getLoginType()) {
                     case eApp -> throw new GeneralException(Code.EXISTS_USER);
@@ -152,7 +150,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
                 }
             }
-        }
+        });
     }
 
     @Override

@@ -39,6 +39,7 @@ public class EmailAuth extends BaseTimeEntity {
     public static EmailAuth createEmailAuth(String email) {
         EmailAuth emailAuth = new EmailAuth();
         emailAuth.setEmail(email);
+        emailAuth.setEmailAuthChecked(true);
         emailAuth.setUser(null);
         return emailAuth;
     }
