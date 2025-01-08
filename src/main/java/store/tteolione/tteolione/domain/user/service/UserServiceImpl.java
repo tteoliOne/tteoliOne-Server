@@ -22,6 +22,7 @@ import store.tteolione.tteolione.domain.user.constant.UserConstants;
 import store.tteolione.tteolione.domain.user.dto.*;
 import store.tteolione.tteolione.domain.user.entity.User;
 import store.tteolione.tteolione.domain.user.repository.UserRepository;
+import store.tteolione.tteolione.global.config.redis.RedisUtil;
 import store.tteolione.tteolione.global.dto.Code;
 import store.tteolione.tteolione.global.exception.GeneralException;
 import store.tteolione.tteolione.global.jwt.TokenProvider;
@@ -30,6 +31,7 @@ import store.tteolione.tteolione.infra.email.dto.v1.VerifyEmailRequest;
 import store.tteolione.tteolione.infra.email.entity.EmailAuth;
 import store.tteolione.tteolione.infra.email.repository.EmailAuthRepository;
 import store.tteolione.tteolione.infra.email.service.v1.EmailService;
+import store.tteolione.tteolione.infra.email.service.v2.EmailServiceV2;
 
 import java.io.*;
 import java.util.Collections;
@@ -46,9 +48,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final RedisTemplate redisTemplate;
+    private final RedisUtil redisUtil;
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthRepository emailAuthRepository;
-    private final EmailService emailService;
+    private final EmailServiceV2 emailService;
     private final S3Service s3Service;
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
@@ -231,38 +234,49 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
             case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
-        emailService.sendEmailAuth(findIdRequest.getEmail());
-        return "이메일 전송 성공";
+
+        boolean result = emailService.sendEmail(findIdRequest.getEmail());
+        if (result) {
+            return "이메일 인증코드 발송에 성공했습니다.";
+        }
+        return "이메일 인증코드 발송에 실패했습니다.";
     }
 
     @Override
     public VerifyLoginIdResponse verifyLoginId(VerifyLoginIdRequest verifyLoginIdRequest) {
-        boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyLoginIdRequest.getAuthCode(), verifyLoginIdRequest.getEmail()));
+        String codeFoundByEmail = redisUtil.getData("code:" + verifyLoginIdRequest.getEmail());
+        boolean isVerify = emailService.verifyEmailCode(verifyLoginIdRequest.getEmail(), verifyLoginIdRequest.getAuthCode(), codeFoundByEmail);
         if (!isVerify) {
             throw new GeneralException(Code.VERIFY_EMAIL_CODE);
         }
         User findUser = userRepository.findByUsernameAndEmail(verifyLoginIdRequest.getUsername(), verifyLoginIdRequest.getEmail())
                 .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
-        return new VerifyLoginIdResponse(findUser.getLoginId());
+        return VerifyLoginIdResponse.from(findUser.getLoginId());
     }
 
     @Override
     public String findPassword(FindPasswordRequest findPasswordRequest) throws Exception {
         User findUser = userRepository.findByUsernameAndEmailAndLoginId(findPasswordRequest.getUsername(), findPasswordRequest.getEmail(), findPasswordRequest.getLoginId())
                 .orElseThrow(() -> new GeneralException(Code.NOT_FOUND_USER_INFO));
+
         switch (findUser.getLoginType()) {
             case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
             case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
             case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
             case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
         }
-        emailService.sendEmailAuth(findPasswordRequest.getEmail());
-        return "이메일 전송 성공";
+
+        boolean result = emailService.sendEmail(findPasswordRequest.getEmail());
+        if (result) {
+            return "이메일 인증코드 발송에 성공했습니다.";
+        }
+        return "이메일 인증코드 발송에 실패했습니다.";
     }
 
     @Override
     public String verifyPassword(VerifyPasswordRequest verifyPasswordRequest) {
-        boolean isVerify = emailService.verifyEmailCode(new VerifyEmailRequest(verifyPasswordRequest.getAuthCode(), verifyPasswordRequest.getEmail()));
+        String codeFoundByEmail = redisUtil.getData("code:" + verifyPasswordRequest.getEmail());
+        boolean isVerify = emailService.verifyEmailCode(verifyPasswordRequest.getEmail(), verifyPasswordRequest.getAuthCode(), codeFoundByEmail);
         if (!isVerify) {
             throw new GeneralException(Code.VERIFY_EMAIL_CODE);
         }

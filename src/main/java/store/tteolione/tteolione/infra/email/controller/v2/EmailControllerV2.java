@@ -24,6 +24,7 @@ public class EmailControllerV2 {
 
     @PostMapping("/send")
     public BaseResponse<String> sendEmail(@Valid @RequestBody EmailSendReq request) throws MessagingException {
+        emailService.validateExistUser(request.getEmail());
         boolean result = emailService.sendEmail(request.getEmail());
         if (result) {
             return BaseResponse.of("이메일 인증코드 발송에 성공했습니다.");
