@@ -8,4 +8,5 @@ public interface EmailServiceV2 {
 
     boolean verifyEmailCode(String email, String code, String codeFoundByEmail);
 
+    void validateExistUser(String email);
 }

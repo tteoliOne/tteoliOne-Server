@@ -29,17 +29,6 @@ public class EmailServiceV2Impl implements EmailServiceV2{
 
     @Override
     public boolean sendEmail(String toEmail) throws MessagingException {
-        Optional<User> _findUser = userRepository.findByEmail(toEmail);
-        if (_findUser.isPresent()) {
-            User findUser = _findUser.get();
-            switch (findUser.getLoginType()) {
-                case eApp -> throw new GeneralException(Code.EXISTS_USER);
-                case eKakao -> throw new GeneralException(Code.EXISTS_KAKAO);
-                case eGoogle -> throw new GeneralException(Code.EXISTS_GOOGLE);
-                case eNaver -> throw new GeneralException(Code.EXISTS_NAVER);
-                case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
-            }
-        }
         if (redisUtil.existData("code:"+toEmail)) {
             redisUtil.deleteData("code:"+toEmail);
         }
@@ -60,6 +49,21 @@ public class EmailServiceV2Impl implements EmailServiceV2{
             return true;
         } else {
             throw new GeneralException(Code.NOT_EXISTS_AUTHCODE);
+        }
+    }
+
+    @Override
+    public void validateExistUser(String toEmail) {
+        Optional<User> _findUser = userRepository.findByEmail(toEmail);
+        if (_findUser.isPresent()) {
+            User findUser = _findUser.get();
+            switch (findUser.getLoginType()) {
+                case eApp -> throw new GeneralException(Code.EXISTS_USER);
+                case eKakao -> throw new GeneralException(Code.EXISTS_KAKAO);
+                case eGoogle -> throw new GeneralException(Code.EXISTS_GOOGLE);
+                case eNaver -> throw new GeneralException(Code.EXISTS_NAVER);
+                case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
+            }
         }
     }
 }
