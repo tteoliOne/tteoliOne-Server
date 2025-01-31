@@ -138,24 +138,37 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public String likeProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
-        Optional<Likes> _findLikes = likesService.findByProductAndUser(product, user);
 
-        if (_findLikes.isEmpty()) {
-            //좋아요를 누른적 없다면 likes 생성후, 좋아요 처리
-            Likes likes = Likes.toEntity(user, product);
-            likesService.createLikes(likes);
-            product.likeProduct(likes);
-            return "좋아요 추가 성공";
-        } else {
-            //좋아요 누른적 있다면 취소 처리 후 데이터 삭제
-            Likes findLikes = _findLikes.get();
-            product.unLikeProduct(findLikes);
-            likesService.deleteLikes(findLikes);
+        Product product = findByIdWithLock(productId);
+        if (product == null) {
+            throw new GeneralException(Code.NOT_EXISTS_PRODUCT);
+        }
+
+        Optional<Likes> _findLike = likesService.findByProductAndUser(product, user);
+        if (_findLike.isPresent()) {
+            //좋아요한 적이 있다면 좋아요 취소 처리
+            Likes likes = _findLike.get();
+            product.unLikeProduct(likes);
+            likesService.deleteLikes(likes);
             return "좋아요 취소 성공";
         }
+
+        //좋아요한 적이 없다면 좋아요 추가 처리
+        Likes like = Likes.builder()
+                .user(user)
+                .product(product)
+                .build();
+        likesService.createLikes(like);
+        product.likeProduct(like);
+        return "좋아요 추가 성공";
+    }
+
+    private Product findByIdWithLock(Long productId) {
+        //비관적 락(쓰기) - 데이터에 대한 읽기 및 쓰기를 다른 트랜잭션이 수행할 수 없도록 잠금
+        //상품 전체 좋아요 칼럼으로 인한 동시성 제어를 하기 위함
+        return productRepository.findByIdWithLock(productId);
     }
 
     @Override
@@ -191,7 +204,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException  {
+    public PostProductResponse editProduct(Long productId, List<MultipartFile> photos, MultipartFile receipt, PostProductRequest postProductRequest) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
 
