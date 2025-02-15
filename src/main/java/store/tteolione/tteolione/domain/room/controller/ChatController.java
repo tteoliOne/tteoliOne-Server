@@ -16,6 +16,9 @@ import store.tteolione.tteolione.global.dto.BaseResponse;
 
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -42,6 +45,18 @@ public class ChatController {
     public BaseResponse<ChattingHistoryResponse> chattingList(@PathVariable("roomNo") Long roomNo) {
         ChattingHistoryResponse chattingList = chatService.getChattingList(roomNo);
         return BaseResponse.of(chattingList);
+    }
+
+    /**
+     * 채팅내역 조회(클라이언트 로컬DB 마지막 날짜 이후)
+     */
+    @GetMapping("/api/v2/chatRoom/{roomNo}/{date}")
+    public BaseResponse<ChattingHistoryResponse> chattingListAfterDate(@PathVariable("roomNo") Long roomNo, @PathVariable("date") Long date) {
+        LocalDateTime lastTime = Instant.ofEpochMilli(date)
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
+        ChattingHistoryResponse response = chatService.chattingListAfterDate(roomNo, lastTime);
+        return BaseResponse.of(response);
     }
 
     /**
