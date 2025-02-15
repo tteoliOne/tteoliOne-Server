@@ -184,6 +184,60 @@ public class ChatService {
                 .build();
     }
 
+    public ChattingHistoryResponse chattingListAfterDate(Long roomNo, LocalDateTime date) {
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
+
+        //채팅내역 조회니까 다른 사람이 보낸 것을 읽음처리해야됨
+        updateAllRead(roomNo, user.getLoginId());
+
+        List<ChatResponse> chattingList = new ArrayList<>();
+        List<Chatting> chatList = mongoChatRepository.findByChatRoomNoAndSendDateAfter(roomNo, date);
+
+        //채팅기록
+        for (Chatting chatting : chatList) {
+            ChatResponse chatResponse = new ChatResponse(chatting, user.getUserId());
+            chattingList.add(chatResponse);
+        }
+
+        Chat findChatRoom = chatRepository.findByChatId(roomNo).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_CHAT_ROOM));
+        Long productId = findChatRoom.getProductNo();
+        Product findProduct = productRepository.findByUserAndProductId(productId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_PRODUCT));
+        User opponentUser;
+        // 자신이 상품을 공유하는 사람이면 -> 채팅을 개설한 사람 닉네임 전송(opponentNickname)
+        if (user.getUserId().equals(findProduct.getUser().getUserId())) {
+            opponentUser = userRepository.findById(findChatRoom.getCreateMember()).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
+        } else {
+            //상품을 공유하는 사람(opponentNickname)
+            opponentUser = findProduct.getUser();
+        }
+
+        //자신이 판매자인지
+        boolean checkSeller = findProduct.getUser().getUserId().equals(user.getUserId()); //판매자가 JWT 토큰과 일치할때
+
+        boolean checkReservation = checkSeller ?
+                productTradeRepository.existsByProductAndBuyer(findProduct, opponentUser) : productTradeRepository.existsByProductAndBuyer(findProduct, user);
+
+        boolean checkReview = reviewRepository.existsByProduct(findProduct);
+
+        return ChattingHistoryResponse.builder()
+                .loginId(user.getLoginId())
+                .productId(findProduct.getProductId())
+                .title(findProduct.getTitle())
+                .productImage(findProduct.productProfile())
+                .sharePrice(findProduct.getSharePrice())
+                .opponentId(opponentUser.getUserId())
+                .opponentNickname(opponentUser.getNickname())
+                .opponentProfile(opponentUser.getProfile())
+                .exitOpponent(checkSeller ? findChatRoom.isExitCreateMember() : findChatRoom.isExitJoinMember())
+                .soldStatus(findProduct.getSoldStatus())
+                .checkSeller(checkSeller)
+                .checkReservation(checkReservation)
+                .checkReview(checkReview)
+                .chatList(chattingList)
+                .build();
+    }
+
     public List<ChatRoomResponse> getChatList(Long productNo) {
         String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
         User findUser = userRepository.findByLoginId(loginId).orElseThrow(() -> new GeneralException(Code.NOT_EXISTS_USER));
@@ -332,4 +386,5 @@ public class ChatService {
         //메시지 전송
         sender.send(ConstantUtils.KAFKA_TOPIC, message);
     }
+
 }
