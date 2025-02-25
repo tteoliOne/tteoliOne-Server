@@ -104,9 +104,15 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         HashMap<String, Object> userInfo = getKakaoUserInfoHashMap(kakaoResponse);
 
         //이미 회원가입한 회원인지
-        Optional<User> _user = userRepository.findByEmailAndLoginType(userInfo.get("email").toString(), UserConstants.ELoginType.eKakao);
+        Optional<User> _user = userRepository.findByEmail(userInfo.get("email").toString());
         if (_user.isPresent()) {
-            throw new GeneralException(Code.EXISTS_USER);
+            switch (_user.get().getLoginType()) {
+                case eApp -> throw new GeneralException(Code.FOUND_APP_USER);
+                case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+                case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+                case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
+                case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+            }
         }
 
         //이미지 업로드
@@ -220,7 +226,17 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         //이미 회원가입한 회원인지
         Optional<User> _user = userRepository.findByLoginTypeAndProviderId(UserConstants.ELoginType.eApple, appleIdTokenPayload.getSub());
         if (_user.isPresent()) {
-            throw new GeneralException(Code.EXISTS_USER);
+            //이미 회원가입한 회원인지
+            Optional<User> _existUser = userRepository.findByEmail(userInfo.get("email").toString());
+            if (_existUser.isPresent()) {
+                switch (_existUser.get().getLoginType()) {
+                    case eApp -> throw new GeneralException(Code.FOUND_APP_USER);
+                    case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
+                    case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
+                    case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
+                    case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+                }
+            }
         }
 
         //이미지 업로드
