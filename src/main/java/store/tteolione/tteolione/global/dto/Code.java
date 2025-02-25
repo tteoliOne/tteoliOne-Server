@@ -39,6 +39,7 @@ public enum Code {
     NOT_FOUND_CATEGORY(116, HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
     EXISTS_LOGIN_ID(117, HttpStatus.BAD_REQUEST, "중복된 아이디입니다."),
     NOT_FOUND_USER_INFO(118, HttpStatus.BAD_REQUEST, "회원정보가 일치하지 않습니다."),
+    FOUND_APP_USER(141, HttpStatus.BAD_REQUEST, "앱 로그인 회원입니다."),
     FOUND_APPLE_USER(119, HttpStatus.BAD_REQUEST, "네이버 로그인 회원입니다."),
     FOUND_KAKAO_USER(120, HttpStatus.BAD_REQUEST, "카카오 로그인 회원입니다."),
     FOUND_NAVER_USER(121, HttpStatus.BAD_REQUEST, "네이버 로그인 회원입니다."),
