@@ -3,6 +3,7 @@ package store.tteolione.tteolione.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -107,11 +108,11 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         Optional<User> _user = userRepository.findByEmail(userInfo.get("email").toString());
         if (_user.isPresent()) {
             switch (_user.get().getLoginType()) {
-                case eApp -> throw new GeneralException(Code.FOUND_APP_USER);
-                case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
-                case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
-                case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
-                case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+                case eApp -> throw new GeneralException(Code.EXISTS_APP);
+                case eGoogle -> throw new GeneralException(Code.EXISTS_GOOGLE);
+                case eNaver -> throw new GeneralException(Code.EXISTS_NAVER);
+                case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
+                case eKakao -> throw new GeneralException(Code.EXISTS_KAKAO);
             }
         }
 
@@ -230,11 +231,11 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
             Optional<User> _existUser = userRepository.findByEmail(userInfo.get("email").toString());
             if (_existUser.isPresent()) {
                 switch (_existUser.get().getLoginType()) {
-                    case eApp -> throw new GeneralException(Code.FOUND_APP_USER);
-                    case eGoogle -> throw new GeneralException(Code.FOUND_GOOGLE_USER);
-                    case eNaver -> throw new GeneralException(Code.FOUND_NAVER_USER);
-                    case eApple -> throw new GeneralException(Code.FOUND_APPLE_USER);
-                    case eKakao -> throw new GeneralException(Code.FOUND_KAKAO_USER);
+                    case eApp -> throw new GeneralException(Code.EXISTS_APP);
+                    case eGoogle -> throw new GeneralException(Code.EXISTS_GOOGLE);
+                    case eNaver -> throw new GeneralException(Code.EXISTS_NAVER);
+                    case eApple -> throw new GeneralException(Code.EXISTS_APPLE);
+                    case eKakao -> throw new GeneralException(Code.EXISTS_KAKAO);
                 }
             }
         }
