@@ -22,9 +22,10 @@ public enum Code {
 
     OK(0, HttpStatus.OK, "Ok"),
     EXISTS_USER(101, HttpStatus.BAD_REQUEST, "이미 회원가입한 회원입니다."),
-    EXISTS_KAKAO(102, HttpStatus.BAD_REQUEST, "이미 카카오로 로그인한 회원입니다."),
-    EXISTS_GOOGLE(103, HttpStatus.BAD_REQUEST, "이미 구글로 로그인한 회원입니다."),
-    EXISTS_NAVER(104, HttpStatus.BAD_REQUEST, "이미 네이버로 로그인한 회원입니다."),
+    EXISTS_APP(142, HttpStatus.BAD_REQUEST, "이미 앱으로 회원가입한 회원입니다."),
+    EXISTS_KAKAO(102, HttpStatus.BAD_REQUEST, "이미 카카오로 회원가입한 회원입니다."),
+    EXISTS_GOOGLE(103, HttpStatus.BAD_REQUEST, "이미 구글로 회원가입한 회원입니다."),
+    EXISTS_NAVER(104, HttpStatus.BAD_REQUEST, "이미 네이버로 회원가입한 회원입니다."),
     EXISTS_APPLE(105, HttpStatus.BAD_REQUEST, "이미 애플로 로그인한 회원입니다."),
     IDENTIFY_EMAIL(106, HttpStatus.BAD_REQUEST, "본인인증 버튼을 눌러주세요."),
     VALIDATION_EMAIL(107, HttpStatus.BAD_REQUEST, "이메일 인증이 되어있지 않습니다."),
